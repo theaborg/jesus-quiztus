@@ -5,6 +5,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const { Pool } = require("pg");
 require("dotenv").config();
+const { createClient } = require("@supabase/supabase-js");
 
 // Application
 const app = express();
@@ -32,6 +33,23 @@ io.on("connection", (socket) => {
     io.emit("receive_message", data);
   });
 });
+
+app.post("/create-user", async (req, res) => {
+  const { email, password, username, name } = req.body;
+  try {
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      user_metadata: { username, name },
+    });
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 // Database connection
 const db = new Pool({

@@ -2,39 +2,42 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
+
 const supabase = createClient(
+  //TODO: använd miljövariabler istället för att hårdkoda
+  //process.env.SUPABASE_URL,
   "https://rixhhkmrhhmiajvxrfli.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMTg3MDgsImV4cCI6MjA1OTU5NDcwOH0.0vubc3l45l2WK8QBlFZNqZwjzJ-1TopoHC1cljVD7RM"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDAxODcwOCwiZXhwIjoyMDU5NTk0NzA4fQ.RkbgDMDjUyJGr4Ilg4ppvBbQog3JX3yv8899tbpcyAc"
 );
+
+
 
 export default function App() {
   const [messages, setMessages] = useState([]);
 
   const sendMessage = async () => {
-    await fetch("https://rixhhkmrhhmiajvxrfli.supabase.co/smart-service", {
+    await fetch("https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/smart-service", {
       method: "POST",
       body: { name: "Functions" },
     });
   };
 
   const createUser = async () => {
-    //const res = await fetch("https://rixhhkmrhhmiajvxrfli.functions.supabase.co/create-user", {
-    const res = await fetch("http://localhost:54321/functions/v1/create-user", {
+    const res = await fetch("https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/create-user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: "test@example.com",
-        password: "jesus1234",
-        username: "godmaker600",
         name: "Jesus",
+        nickname: "godmaker600",
       }),
     });
   
     const data = await res.json();
     console.log(data);
   };
+  
 
   useEffect(() => {
     const channel = supabase
