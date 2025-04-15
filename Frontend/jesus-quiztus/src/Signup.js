@@ -6,6 +6,8 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  
 
   function generateFakeEmail(domain = "example.com") {
     const randomString = Math.random().toString(36).substring(2, 10); // 8-char random string
@@ -13,26 +15,19 @@ export default function Auth() {
     return `${username}@${domain}`;
   }
 
-  const createUser = async (nickname, user_id) => {
-    const { data, error } = await supabase.rpc("insert_user", {
-      user_name: user_id,
-      user_nickname: nickname,
-    });
-
-    if (error) {
-      console.error("Error inserting user:", error.message);
-    } else {
-      console.log("User inserted:", data);
-    }
-  };
-
   const handleSignUp = async (e) => {
     e.preventDefault();
     let fake_email = generateFakeEmail("jesusquiztus.se");
     console.log("Fake email:", fake_email);
     const { data, error } = await supabase.auth.signUp({
       email: fake_email,
-      password,
+      password: password,
+      options: {
+        data: {
+          name: name,
+          nickname: username,
+        }
+      }
     });
 
     if (error) {
@@ -44,8 +39,8 @@ export default function Auth() {
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (supabase.auth.getUser()) {
-        console.log("User ID:", userdata.user.id);
-        await createUser(username, user.UID);
+        console.log("User ID:", userData.user.id);
+        //await createUser(username, user.UID);
       } else {
         console.log("Waiting for user confirmation before DB insert.");
       }
@@ -75,6 +70,13 @@ export default function Auth() {
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         required
       />
       <button type="submit">Registrera</button>
