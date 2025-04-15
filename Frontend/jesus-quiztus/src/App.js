@@ -1,7 +1,7 @@
 // App.js eller App.tsx
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-
+import Home from "./Home";
 
 const supabase = createClient(
   //TODO: använd miljövariabler istället för att hårdkoda
@@ -10,34 +10,38 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDAxODcwOCwiZXhwIjoyMDU5NTk0NzA4fQ.RkbgDMDjUyJGr4Ilg4ppvBbQog3JX3yv8899tbpcyAc"
 );
 
-
-
 export default function App() {
   const [messages, setMessages] = useState([]);
+  const [session, setSession] = useState(null);
 
   const sendMessage = async () => {
-    await fetch("https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/smart-service", {
-      method: "POST",
-      body: { name: "Functions" },
-    });
+    await fetch(
+      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/smart-service",
+      {
+        method: "POST",
+        body: { name: "Functions" },
+      }
+    );
   };
 
   const createUser = async () => {
-    const res = await fetch("https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/create-user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: "Jesus",
-        nickname: "godmaker600",
-      }),
-    });
-  
+    const res = await fetch(
+      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/create-user",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: "Jesus",
+          nickname: "godmaker600",
+        }),
+      }
+    );
+
     const data = await res.json();
     console.log(data);
   };
-  
 
   useEffect(() => {
     const channel = supabase
@@ -57,15 +61,43 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  console.log("App laddades!");
+
+  // return (
+  //   <div>
+  //     {!session && (
+  //       <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+  //     )}
+
+  //     <div>
+  //       {session ? <p>Logged in!</p> : <p>Not logged in</p>}
+  //       <button onClick={sendMessage}>Skicka meddelande</button>
+  //       <button onClick={createUser}>Skapa användare</button>
+  //       <ul>
+  //         {messages.map((msg) => (
+  //           <li key={msg.id}>{msg.content}</li>
+  //         ))}
+  //       </ul>
+  //     </div>
+  //   </div>
+  // );
+
   return (
     <div>
-      <button onClick={sendMessage}>Skicka meddelande</button>
-      <button onClick={createUser}>Skapa användare</button>
-      <ul>
-        {messages.map((msg) => (
-          <li key={msg.id}>{msg.content}</li>
-        ))}
-      </ul>
+      <h1>Supabase Authentication</h1>
+      <Home />
     </div>
   );
 }

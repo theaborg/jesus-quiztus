@@ -16,7 +16,7 @@ app.use(express.json());
 const server = http.createServer(app);
 server.listen(3000, () => {
   console.log("Servern körs på http://localhost:3000");
-});
+}); 
 const io = new Server(server, {
   cors: { origin: "http://localhost:3000" }, // ändra till React-porten
   methods: ["GET", "POST"], // Allowing GET/POST methods (might add more later)
@@ -33,6 +33,8 @@ io.on("connection", (socket) => {
     io.emit("receive_message", data);
   });
 });
+
+
 
 app.post("/create-user", async (req, res) => {
   const { email, password, username, name } = req.body;
