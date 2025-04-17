@@ -1,7 +1,10 @@
 // App.js eller App.tsx
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import Home from "./Home";
+import Home from "./pages/Home";
+import Signup from "./components/Signup";
+import Login from "./components/Login";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 const supabase = createClient(
   //TODO: använd miljövariabler istället för att hårdkoda
@@ -22,25 +25,6 @@ export default function App() {
         body: { name: "Functions" },
       }
     );
-  };
-
-  const createUser = async () => {
-    const res = await fetch(
-      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/create-user",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: "Jesus",
-          nickname: "godmaker600",
-        }),
-      }
-    );
-
-    const data = await res.json();
-    console.log(data);
   };
 
   useEffect(() => {
@@ -95,9 +79,15 @@ export default function App() {
   // );
 
   return (
-    <div>
-      <h1>Supabase Authentication</h1>
-      <Home />
-    </div>
+    <Router>
+      <div>
+        <h1>Jesus Quiztus!</h1>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }

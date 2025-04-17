@@ -1,6 +1,6 @@
 // src/Login.js
 import React, { useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../supabaseClient";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,8 +19,6 @@ export default function Login() {
 
     if (error) {
       setError(error.message);
-    } else {
-      window.location.reload(); 
     }
     setLoading(false);
   };

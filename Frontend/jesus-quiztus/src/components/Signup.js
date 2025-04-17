@@ -1,68 +1,62 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../supabaseClient";
 
 export default function Auth() {
-  //const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  
+  //const [name, setName] = useState("");
 
+  /*
+  Function for testing with fake email addresses.
+  
+  
   function generateFakeEmail(domain = "example.com") {
     const randomString = Math.random().toString(36).substring(2, 10); // 8-char random string
     const username = `user_${randomString}`;
     return `${username}@${domain}`;
   }
+    */
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    let fake_email = generateFakeEmail("jesusquiztus.se");
-    console.log("Fake email:", fake_email);
+    //let fake_email = generateFakeEmail("jesusquiztus.se");
+    //console.log("Fake email:", fake_email);
     const { data, error } = await supabase.auth.signUp({
-      email: fake_email,
+      email: email,
       password: password,
       options: {
         data: {
-          name: name,
           nickname: username,
-        }
-      }
+        },
+      },
     });
 
     if (error) {
       setMessage(`Fel: ${error.message}`);
     } else {
-      setMessage("Konto skapat! Kolla din mejl för bekräftelse.");
+      setMessage("Konto skapat!");
 
       //const user = data.user;
       const { data: userData, error: userError } =
         await supabase.auth.getUser();
       if (supabase.auth.getUser()) {
         console.log("User ID:", userData.user.id);
-        //await createUser(username, user.UID);
       } else {
         console.log("Waiting for user confirmation before DB insert.");
       }
     }
   };
 
-  //   <input
-  //   type="email"
-  //   placeholder="Email"
-  //   value={email}
-  //   onChange={(e) => setEmail(generateFakeEmail("jesusquiztus.se"))}
-  //   required
-  // />
-
   return (
     <form onSubmit={handleSignUp}>
       <h2>Skapa konto</h2>
       <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         required
       />
       <input
@@ -73,10 +67,10 @@ export default function Auth() {
         required
       />
       <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
         required
       />
       <button type="submit">Registrera</button>
