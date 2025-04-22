@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Home from "./pages/Home";
 import Signup from "./components/Signup";
-import Login from "./components/Login";
+import Login from "./components/LoginForm";
+import Game from "./pages/Game";
+import Profile from "./pages/profile";
+import Friends from "./pages/Friends";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { UserProvider } from "./context/UserContext";
 
 const supabase = createClient(
   //TODO: använd miljövariabler istället för att hårdkoda
@@ -82,11 +86,16 @@ export default function App() {
     <Router>
       <div>
         <h1>Jesus Quiztus!</h1>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
+        <UserProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/new-game" element={<Game />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/friends" element={<Friends />} />
+          </Routes>
+        </UserProvider>
       </div>
     </Router>
   );

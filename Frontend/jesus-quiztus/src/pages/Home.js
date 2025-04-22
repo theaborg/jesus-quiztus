@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
-import Login from "../components/Login";
-import Signup from "../components/Signup";
-import Game from "./Game";
-import { Navigate } from "react-router-dom";
-import { navigatorLock } from "@supabase/supabase-js";
+import LoginForm from "../components/LoginForm";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function Home() {
   const [session, setSession] = useState(null);
+  const { displayName } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    const authListener = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     return () => {
-      authListener?.unsubscribe?.();
+      listener?.subscription?.unsubscribe();
     };
   }, []);
+
   if (!session) {
     return (
       <div>
-        {" "}
-        <Signup /> <Login />
+        <LoginForm />
       </div>
     );
   }
@@ -34,10 +36,13 @@ export default function Home() {
   return (
     <div>
       <h1>Welcome {session.user.email}</h1>
-      <button onClick={() => Navigate('/Game')}>New Game</button>
+      <h1>User ID: {session.user.id}</h1>
+      <h1>Nickname: {displayName}</h1>
+      <button onClick={() => navigate("/new-game")}>New Game</button>
       <button onClick={console.log("Join Game")}>Join Game</button>
       <button onClick={console.log("Inv")}>Invitations</button>
-      <button onClick={console.log("Profile")}>Profile</button>
+      <button onClick={() => navigate("/profile")}>Profile</button>
+      <button onClick={() => navigate("/friends")}>Friends</button>
       <button onClick={async () => await supabase.auth.signOut()}>
         Log Out
       </button>
