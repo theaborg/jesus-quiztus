@@ -9,7 +9,6 @@ const UserSearch = ({ currentUserId }) => {
   const [loading, setLoading] = useState(false);
   const { session } = useUser();
 
-
   const handleSearch = async () => {
     setLoading(true);
     const { data, error } = await supabase

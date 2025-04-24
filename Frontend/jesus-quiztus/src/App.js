@@ -7,6 +7,7 @@ import Login from "./components/LoginForm";
 import Game from "./pages/Game";
 import Profile from "./pages/profile";
 import Friends from "./pages/Friends";
+import GameLobby from "./pages/GameLobby";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
 
@@ -94,6 +95,7 @@ export default function App() {
             <Route path="/new-game" element={<Game />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/friends" element={<Friends />} />
+            <Route path="/lobby/:gameId" element={<GameLobby />} />
           </Routes>
         </UserProvider>
       </div>
