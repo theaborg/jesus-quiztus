@@ -1,5 +1,7 @@
 import { useUser } from "../context/UserContext";
 import UserSearch from "../components/UserSearch";
+
+
 export default function Friends() {
     const { displayName } = useUser();
     const { session } = useUser();

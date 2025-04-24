@@ -3,16 +3,9 @@ import { useUser } from "../context/UserContext";
 import { startGame } from "../api/startGame";
 import GameSetupForm from "../components/GameSetup";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; // adjust to your client import
+import { supabase } from "../supabaseClient"; 
 
 /**
- *
- * Setting up a new game by making API-req to opentdb.com
- * Parameters set by user from the gamesetup form in components
- * TODO:
- *  1. Fetch questions from the API based on user input, each question should be a question in Supabase
- *  2. The questions created should be stored as a questionsset in Supabase
- *  3.
  *
  */
 
