@@ -1,6 +1,7 @@
 import { useUser } from "../context/UserContext";
 import { supabase } from "../supabaseClient";
 import { useEffect, useState } from "react";
+import { editNickname } from "../api/editNickname";
 
 export default function Profile() {
   const { session, displayName } = useUser("");
@@ -86,12 +87,26 @@ export default function Profile() {
 
   const handleNicknameChange = async (e) => {
     e.preventDefault();
-    await supabase
-      .from("users")
-      .update({ nickname: nickname })
-      .eq("id", session.user.id);
+    // await supabase
+    //   .from("users")
+    //   .update({ nickname: nickname })
+    //   .eq("id", session.user.id);
 
-    console.log("Nickname changed to:", nickname);
+    // console.log("Nickname changed to:", nickname);
+
+    try {
+      const result = await editNickname(
+        nickname,
+        session.user.id,
+        session.access_token
+      );
+      if (result.success) {
+        alert("Nickname updated successfully!");
+      }
+    } catch (error) {
+      console.error("Error updating nickname:", error.message);
+      alert("Something went wrong. Please try again.");
+    }
   };
 
   // TODO: ta bort <br> efter image när vi lägger till css
@@ -118,8 +133,8 @@ export default function Profile() {
           onChange={(e) => setNickname(e.target.value)}
           required
         />
-        <button className="edit-username" onClick={handleNicknameChange}>
-          Edit username
+        <button className="edit-nickname" onClick={handleNicknameChange}>
+          Edit nickname
         </button>
       </form>
     </div>
