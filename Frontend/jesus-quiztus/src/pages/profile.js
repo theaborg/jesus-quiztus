@@ -3,11 +3,11 @@ import { supabase } from "../supabaseClient";
 import { useEffect, useState } from "react";
 
 export default function Profile() {
-  const { session, displayName } = useUser();
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  const { session, displayName } = useUser("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [nickname, setNickname] = useState("");
 
   const getProfileImage = async () => {
-    console.log("Fetching profile image...");
     if (!session?.user) return;
 
     const { data, error } = await supabase
@@ -15,8 +15,6 @@ export default function Profile() {
       .select("profile_picture")
       .eq("id", session.user.id)
       .single();
-
-    console.log("Data:", data);
 
     if (error) {
       console.error("Error fetching profile_url:", error.message);
@@ -28,15 +26,12 @@ export default function Profile() {
         .from("profile-pictures")
         .getPublicUrl(`${session.user.id}/${data.profile_picture}`);
 
-      console.log("URL Data:", urlData);
-
       if (urlError) {
         console.error("Error getting public URL:", urlError.message);
       } else {
         setAvatarUrl(urlData.publicUrl);
       }
     }
-    console.log("Avatar URL:", avatarUrl);
   };
 
   useEffect(() => {
@@ -89,6 +84,16 @@ export default function Profile() {
     );
   }
 
+  const handleNicknameChange = async (e) => {
+    e.preventDefault();
+    await supabase
+      .from("users")
+      .update({ nickname: nickname })
+      .eq("id", session.user.id);
+
+    console.log("Nickname changed to:", nickname);
+  };
+
   // TODO: ta bort <br> efter image när vi lägger till css
   // TODO: to bort style på bilden när vi lägger till css
   getProfileImage();
@@ -104,8 +109,19 @@ export default function Profile() {
       />
       <br />
       <input type="file" accept="image/*" onChange={handleImageUpload} />
-      <p>Username: {displayName}</p>
-      <button>Edit username</button>
+
+      <form>
+        <input
+          type="Nickname"
+          placeholder={displayName}
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          required
+        />
+        <button className="edit-username" onClick={handleNicknameChange}>
+          Edit username
+        </button>
+      </form>
     </div>
   );
 }

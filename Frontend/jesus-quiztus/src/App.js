@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Signup from "./components/Signup";
 import Login from "./components/LoginForm";
 import Game from "./pages/Game";
-import Profile from "./pages/profile";
+import Profile from "./pages/Profile";
 import Friends from "./pages/Friends";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
