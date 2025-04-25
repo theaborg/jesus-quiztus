@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useUser } from '../context/UserContext';
+import { addFriend } from '../api/addFriend';
 
 const UserSearch = ({ currentUserId }) => {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [addedIds, setAddedIds] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { session } = useUser();
+  const { session, userId } = useUser();
 
+  
 
   const handleSearch = async () => {
     setLoading(true);
@@ -27,6 +29,7 @@ const UserSearch = ({ currentUserId }) => {
     setLoading(false);
   };
 
+  /** 
   const addFriend = async (friendId) => {
     const { error } = await supabase.from('friendships').insert({
       user_id: session.user.id,
@@ -38,6 +41,20 @@ const UserSearch = ({ currentUserId }) => {
       console.error('Error adding friend:', error.message);
     } else {
       setAddedIds([...addedIds, friendId]);
+    }
+  };
+  */
+
+  const handleAddFriend = async (friendId) => {
+    try {
+      const result = await addFriend(friendId, userId, session.access_token);
+      if (result.success) {
+        setAddedIds([...addedIds, friendId]);
+        alert('Friend request sent successfully!');
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error.message);
+      alert('Something went wrong. Please try again.');
     }
   };
 
@@ -61,10 +78,10 @@ const UserSearch = ({ currentUserId }) => {
           <li key={user.id}>
             {user.nickname}{' '}
             <button
-              onClick={() => addFriend(user.id)}
-              disabled={addedIds.includes(user.id)}
-            >
-              {addedIds.includes(user.id) ? 'Request Sent' : 'Add Friend'}
+                onClick={() => handleAddFriend(user.id)}
+                disabled={addedIds.includes(user.id)}
+              >
+                {addedIds.includes(user.id) ? 'Request Sent' : 'Add Friend'}
             </button>
           </li>
         ))}

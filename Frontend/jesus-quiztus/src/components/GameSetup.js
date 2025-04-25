@@ -14,7 +14,6 @@ const GameSetupForm = ({ onStart }) => {
     { id: 9, name: "General Knowledge" },
     { id: 23, name: "History" },
     { id: 17, name: "Science & Nature" },
-    // add more if needed
   ];
 
   const difficulties = ["", "easy", "medium", "hard"];

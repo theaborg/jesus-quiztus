@@ -36,7 +36,6 @@ export default function Home() {
   return (
     <div>
       <h1>Welcome {session.user.email}</h1>
-      <h1>User ID: {session.user.id}</h1>
       <h1>Nickname: {displayName}</h1>
       <button onClick={() => navigate("/new-game")}>New Game</button>
       <button onClick={console.log("Join Game")}>Join Game</button>

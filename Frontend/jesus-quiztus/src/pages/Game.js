@@ -1,49 +1,42 @@
 import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
+import { startGame } from "../api/startGame";
 import GameSetupForm from "../components/GameSetup";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient"; 
 
 /**
- * 
- * Setting up a new game by making API-req to opentdb.com
- * Parameters set by user from the gamesetup form in components 
- * TODO: 
- *  - Check correctness
- *  - Stuff
- *  
+ *
  */
 
 export default function Game() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [questions, setQuestions] = useState([]);
   const { displayName, session } = useUser();
 
-  const [questions, setQuestions] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const handleStart = async (formData) => {
+    const {
+      data: { session: authSession },
+      error,
+    } = await supabase.auth.getSession();
 
-  const handleStartGame = async (config) => {
-    setLoading(true);
-    setError("");
-    setQuestions(null);
+    if (error || !authSession) {
+      alert("User session missing or expired.");
+      return;
+    }
 
-    const url = new URL("https://opentdb.com/api.php");
-    url.searchParams.append("amount", config.amount);
-    if (config.category) url.searchParams.append("category", config.category);
-    if (config.difficulty) url.searchParams.append("difficulty", config.difficulty);
-    if (config.type) url.searchParams.append("type", config.type);
-    if (config.encoding) url.searchParams.append("encode", config.encoding);
+    //console.log("Frontend session from context:", session);
+    //console.log("Frontend session from auth:", authSession);
+    //console.log("Token:", authSession?.access_token);
+
 
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.response_code !== 0) {
-        throw new Error("No questions found. Try different settings.");
-      }
-
-      setQuestions(data.results);
-    } catch (err) {
-      setError(err.message || "Something went wrong while fetching questions.");
-    } finally {
-      setLoading(false);
+      const result = await startGame(formData, authSession.access_token);
+      navigate(`/lobby/${result.gameId}`);
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -59,22 +52,7 @@ export default function Game() {
       {loading && <p>Loading questions...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!questions && !loading && (
-        <GameSetupForm onStart={handleStartGame} />
-      )}
-
-      {questions && (
-        <div>
-          <h2>Game Started!</h2>
-          {questions.map((q, index) => (
-            <div key={index} style={{ marginBottom: "1rem" }}>
-              <strong dangerouslySetInnerHTML={{ __html: q.question }} />
-              <br />
-              <em>Correct answer: {q.correct_answer}</em>
-            </div>
-          ))}
-        </div>
-      )}
+      {!loading && <GameSetupForm onStart={handleStart} />}
     </div>
   );
 }
