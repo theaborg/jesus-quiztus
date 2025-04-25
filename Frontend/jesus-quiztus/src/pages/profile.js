@@ -16,15 +16,19 @@ export default function Profile() {
       .eq("id", session.user.id)
       .single();
 
+    console.log("Data:", data);
+
     if (error) {
       console.error("Error fetching profile_url:", error.message);
       return;
     }
 
-    if (data?.profile_url) {
+    if (data) {
       const { data: urlData, error: urlError } = supabase.storage
         .from("profile-pictures")
-        .getPublicUrl(data.profile_url);
+        .getPublicUrl(`${session.user.id}/${data.profile_picture}`);
+
+      console.log("URL Data:", urlData);
 
       if (urlError) {
         console.error("Error getting public URL:", urlError.message);
