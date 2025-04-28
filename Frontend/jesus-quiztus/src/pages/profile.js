@@ -48,13 +48,13 @@ export default function Profile() {
         session.access_token
       );
       if (result.success) {
-        alert("Profile picture updated successfully!");
         console.log("Public URL:", result.publicUrl);
       }
     } catch (error) {
       console.error("Error updating profile picture:", error.message);
       alert("Something went wrong. Please try again.");
     }
+    getProfileImage();
   };
 
   const handleNicknameChange = async (e) => {
@@ -84,7 +84,6 @@ export default function Profile() {
   }
   // TODO: ta bort <br> efter image när vi lägger till css
   // TODO: to bort style på bilden när vi lägger till css
-  getProfileImage();
 
   return (
     <div>
