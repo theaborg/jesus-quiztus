@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
+// Setting up CORS headers
+// This allows the function to be called from any origin like localhost or any other domain
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -14,6 +17,8 @@ serve(async (req) => {
   }
 
   const supabase = createClient(
+    // Creating a supabase client instance
+    // Should change this like in the Frontend maybe
     "https://rixhhkmrhhmiajvxrfli.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMTg3MDgsImV4cCI6MjA1OTU5NDcwOH0.0vubc3l45l2WK8QBlFZNqZwjzJ-1TopoHC1cljVD7RM",
     {
@@ -32,13 +37,14 @@ serve(async (req) => {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
+    // Errors with the authentication or no user found send a 401 response
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: corsHeaders,
     });
   }
 
-  // Parse input
+  // Getting the form data from the request body
   const body = await req.json();
   const { amount, category, difficulty, type, encoding } = body;
 

@@ -13,6 +13,8 @@ export default function Game() {
   const navigate = useNavigate();
   const { displayName, session } = useUser();
 
+
+  // Handling the form for setting up a new game
   const handleStart = async (formData) => {
     const {
       data: { session: authSession },
@@ -30,6 +32,10 @@ export default function Game() {
 
 
     try {
+      // awaiting results from the API-req startGame. 
+      // Then navigating the user to the game lobby for that game.
+      // TODO:
+      // Should maybe check that this is a valid gameID?
       const result = await startGame(formData, authSession.access_token);
       navigate(`/lobby/${result.gameId}`);
     } catch (error) {

@@ -50,7 +50,7 @@ const GameSetupForm = ({ onStart }) => {
 
   const difficulties = ["", "easy", "medium", "hard"];
   const types = ["", "multiple", "boolean"];
-  const encodings = ["", "url3986", "base64"];
+  //const encodings = ["", "url3986", "base64"];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -118,24 +118,6 @@ const GameSetupForm = ({ onStart }) => {
           ))}
         </select>
       </label>
-      {/*
-      <label>
-        Encoding:
-        <select
-          name="encoding"
-          onChange={handleChange}
-          value={formData.encoding}
-        >
-          <option value="">Default</option>
-          {encodings.slice(1).map((e) => (
-            <option key={e} value={e}>
-              {e.toUpperCase()}
-            </option>
-          ))}
-        </select>
-      </label>
-      */}
-
       <button type="submit">Start Game</button>
     </form>
   );
