@@ -2,6 +2,7 @@ import { useUser } from "../context/UserContext";
 import { supabase } from "../supabaseClient";
 import { useEffect, useState } from "react";
 import { editNickname } from "../api/editNickname";
+import { updateProfilePicture } from "../api/updateProfilePicture";
 
 export default function Profile() {
   const { session, displayName } = useUser("");
@@ -40,59 +41,24 @@ export default function Profile() {
   }, [session]);
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file || !session?.user) return;
-
-    const fileExt = file.name.split(".").pop();
-    const fileName = `profile.${fileExt}`; // valfritt namn på bilden
-    const filePath = `${session.user.id}/${fileName}`; // mapp = user id
-
-    const { error: uploadError } = await supabase.storage
-      .from("profile-pictures")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error("Upload failed:", uploadError.message);
-      return;
-    }
-
-    // Sparar bildens namn i databasen, för användaren kan ladda upp flera bilder
-    await supabase
-      .from("users")
-      .update({ profile_picture: fileName })
-      .eq("id", session.user.id);
-
-    // Hämta public URL för bilden
-    const { data: urlData, error: urlError } = supabase.storage
-      .from("profile-pictures")
-      .getPublicUrl(filePath);
-
-    if (urlError) {
-      console.error("Could not get public URL:", urlError.message);
-    } else {
-      setAvatarUrl(urlData.publicUrl);
+    try {
+      const result = await updateProfilePicture(
+        e.target.files[0],
+        session.user.id,
+        session.access_token
+      );
+      if (result.success) {
+        alert("Profile picture updated successfully!");
+        console.log("Public URL:", result.publicUrl);
+      }
+    } catch (error) {
+      console.error("Error updating profile picture:", error.message);
+      alert("Something went wrong. Please try again.");
     }
   };
 
-  if (!session) {
-    return (
-      <div>
-        <h1>Please log in to see your profile.</h1>
-      </div>
-    );
-  }
-
   const handleNicknameChange = async (e) => {
     e.preventDefault();
-    // await supabase
-    //   .from("users")
-    //   .update({ nickname: nickname })
-    //   .eq("id", session.user.id);
-
-    // console.log("Nickname changed to:", nickname);
 
     try {
       const result = await editNickname(
@@ -109,6 +75,13 @@ export default function Profile() {
     }
   };
 
+  if (!session) {
+    return (
+      <div>
+        <h1>Please log in to see your profile.</h1>
+      </div>
+    );
+  }
   // TODO: ta bort <br> efter image när vi lägger till css
   // TODO: to bort style på bilden när vi lägger till css
   getProfileImage();
