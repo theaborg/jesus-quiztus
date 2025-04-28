@@ -22,8 +22,7 @@ export default function Profile() {
       console.error("Error fetching profile_url:", error.message);
       return;
     }
-
-    if (data) {
+    if (data.profile_picture) {
       const { data: urlData, error: urlError } = supabase.storage
         .from("profile-pictures")
         .getPublicUrl(`${session.user.id}/${data.profile_picture}`);
