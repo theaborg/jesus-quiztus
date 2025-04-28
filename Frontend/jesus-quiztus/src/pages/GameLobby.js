@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { supabase } from "../supabaseClient"; 
+import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
 
-
 const GameLobby = () => {
-  const { gameId } = useParams();                                           // Hämtar gameId från URL:en
-  const [questions, setQuestions] = useState([]);                           // Frågor
-  const [loading, setLoading] = useState(true);                             // Kanske onödig? Visar laddskärm
-  const [isReady, setIsReady] = useState(false);                            // Kollar att user är redo att köra igång spelet
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);      // Håller koll på vilken fråga vi är på
-  const navigate = useNavigate();                                           // Så vi kan komma tillbaka till start
+  const { gameId } = useParams(); // Hämtar gameId från URL:en
+  const [questions, setQuestions] = useState([]); // Frågor
+  const [loading, setLoading] = useState(true); // Kanske onödig? Visar laddskärm
+  const [isReady, setIsReady] = useState(false); // Kollar att user är redo att köra igång spelet
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Håller koll på vilken fråga vi är på
+  const navigate = useNavigate(); // Så vi kan komma tillbaka till start
 
-  const [selectedAnswer, setSelectedAnswer] = useState(null);               // Sparar vilket alternativ användaren klickat på
-  const [answers, setAnswers] = useState([]);                               // Sparar användarens svar på varje fråga
-
-
+  const [answers, setAnswers] = useState([]); // Sparar användarens svar på varje fråga
 
   // När komponenten laddas, hämta frågorna som hör till spelet
   useEffect(() => {
@@ -63,7 +59,6 @@ const GameLobby = () => {
   // kastar om svaren
   const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
-
   // Visa laddningsskärm om frågorna inte hunnit hämtas än
   if (loading) {
     return <div>Loading game data...</div>;
@@ -94,12 +89,18 @@ const GameLobby = () => {
             const isCorrect = answer.selected === answer.correct;
             return (
               <li key={index} className="border rounded-lg p-4">
-                <p className="font-semibold mb-1">
-                  Q{index + 1}: {question.text}
-                </p>
+                <p
+                  className="font-semibold mb-1"
+                  dangerouslySetInnerHTML={{
+                    __html: `Q${index + 1}: ${question.text}`,
+                  }}
+                />
                 <p>
                   ✅ Rätt svar:{" "}
-                  <span className="font-medium">{answer.correct}</span>
+                  <span
+                    className="font-medium"
+                    dangerouslySetInnerHTML={{ __html: answer.correct }}
+                  />
                 </p>
                 <p>
                   🧍 Ditt svar:{" "}
@@ -107,9 +108,8 @@ const GameLobby = () => {
                     className={`font-medium ${
                       isCorrect ? "text-green-600" : "text-red-600"
                     }`}
-                  >
-                    {answer.selected}
-                  </span>{" "}
+                    dangerouslySetInnerHTML={{ __html: answer.selected }}
+                  />{" "}
                   {isCorrect ? "✔️" : "❌"}
                 </p>
               </li>
@@ -127,7 +127,12 @@ const GameLobby = () => {
   return (
     <div className="p-4">
       <h2 className="text-2xl mb-4">Fråga {currentQuestionIndex + 1}</h2>
-      <p className="mb-6 text-lg">{question.text}</p>
+      {/*<p className="mb-6 text-lg">{question.text}</p> */}
+      <p
+        className="mb-6 text-lg"
+        dangerouslySetInnerHTML={{ __html: question.text }}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {question.alternatives.map((alt, index) => (
           <button
@@ -147,7 +152,7 @@ const GameLobby = () => {
               setCurrentQuestionIndex((prev) => prev + 1);
             }}
           >
-            {alt}
+            <span dangerouslySetInnerHTML={{ __html: alt }} />
           </button>
         ))}
       </div>

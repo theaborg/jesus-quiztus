@@ -1,5 +1,16 @@
 import React, { useState } from "react";
 
+/**
+ *
+ * Här kanske vi vill lägga in fler saker?
+ * Tankar:
+ * 1. Ska man välja hur många spelare som ska kunna joina varje spel?
+ *  1.1 TÄnker typ kahoot versionen. En öppen länk och alla kan joina.
+ *  1.2 Eller så är det bara en invitad spelare som kan joina?
+ * 2. Kanske bör kunna skriva in någon slags join kod i DB också så att andra spelare kan joina?
+ *
+ */
+
 const GameSetupForm = ({ onStart }) => {
   const [formData, setFormData] = useState({
     amount: 10,
@@ -12,8 +23,29 @@ const GameSetupForm = ({ onStart }) => {
   const categories = [
     { id: "", name: "Any Category" },
     { id: 9, name: "General Knowledge" },
-    { id: 23, name: "History" },
+    { id: 10, name: "Entertainment: Books" },
+    { id: 11, name: "Entertainment: Film" },
+    { id: 12, name: "Entertainment: Music" },
+    { id: 13, name: "Entertainment: Musicals & Theatres" },
+    { id: 14, name: "Entertainment: Television" },
+    { id: 15, name: "Entertainment: Video Games" },
+    { id: 16, name: "Entertainment: Board Games" },
     { id: 17, name: "Science & Nature" },
+    { id: 18, name: "Science: Computers" },
+    { id: 19, name: "Science: Mathematics" },
+    { id: 20, name: "Mythology" },
+    { id: 21, name: "Sports" },
+    { id: 22, name: "Geography" },
+    { id: 23, name: "History" },
+    { id: 24, name: "Politics" },
+    { id: 25, name: "Art" },
+    { id: 26, name: "Celebrities" },
+    { id: 27, name: "Animals" },
+    { id: 28, name: "Vehicles" },
+    { id: 29, name: "Entertainment: Comics" },
+    { id: 30, name: "Science: Gadgets" },
+    { id: 31, name: "Entertainment: Japanese Anime & Manga" },
+    { id: 32, name: "Entertainment: Cartoon & Animations" },
   ];
 
   const difficulties = ["", "easy", "medium", "hard"];
@@ -26,6 +58,9 @@ const GameSetupForm = ({ onStart }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setFormData({
+      encoding: "",
+    });
     onStart(formData);
   };
 
@@ -43,7 +78,11 @@ const GameSetupForm = ({ onStart }) => {
 
       <label>
         Category:
-        <select name="category" onChange={handleChange} value={formData.category}>
+        <select
+          name="category"
+          onChange={handleChange}
+          value={formData.category}
+        >
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -54,7 +93,11 @@ const GameSetupForm = ({ onStart }) => {
 
       <label>
         Difficulty:
-        <select name="difficulty" onChange={handleChange} value={formData.difficulty}>
+        <select
+          name="difficulty"
+          onChange={handleChange}
+          value={formData.difficulty}
+        >
           <option value="">Any</option>
           {difficulties.slice(1).map((d) => (
             <option key={d} value={d}>
@@ -75,10 +118,14 @@ const GameSetupForm = ({ onStart }) => {
           ))}
         </select>
       </label>
-
+      {/*
       <label>
         Encoding:
-        <select name="encoding" onChange={handleChange} value={formData.encoding}>
+        <select
+          name="encoding"
+          onChange={handleChange}
+          value={formData.encoding}
+        >
           <option value="">Default</option>
           {encodings.slice(1).map((e) => (
             <option key={e} value={e}>
@@ -87,6 +134,7 @@ const GameSetupForm = ({ onStart }) => {
           ))}
         </select>
       </label>
+      */}
 
       <button type="submit">Start Game</button>
     </form>

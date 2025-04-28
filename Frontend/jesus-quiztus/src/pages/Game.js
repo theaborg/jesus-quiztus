@@ -11,9 +11,6 @@ import { supabase } from "../supabaseClient";
 
 export default function Game() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [questions, setQuestions] = useState([]);
   const { displayName, session } = useUser();
 
   const handleStart = async (formData) => {
@@ -48,11 +45,7 @@ export default function Game() {
     <div>
       <h1>New Game</h1>
       <p>Please setup your choices or stuffs, {displayName}!</p>
-
-      {loading && <p>Loading questions...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {!loading && <GameSetupForm onStart={handleStart} />}
+      <GameSetupForm onStart={handleStart} />
     </div>
   );
 }

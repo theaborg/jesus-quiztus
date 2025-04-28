@@ -3,7 +3,7 @@ export async function startGame(formData, accessToken) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`, // 👈 this is required
+        "Authorization": `Bearer ${accessToken}`,
       },
       body: JSON.stringify(formData),
     });
