@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 export default function Home() {
-  const [session, setSession] = useState(null);
-  const { displayName } = useUser();
+  //const [session, setSession] = useState(null);
+  const { displayName, session } = useUser();
   const navigate = useNavigate();
 
+  /*
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -24,6 +25,7 @@ export default function Home() {
       listener?.subscription?.unsubscribe();
     };
   }, []);
+  */
 
   if (!session) {
     return (
@@ -38,8 +40,8 @@ export default function Home() {
       <h1>Welcome {session.user.email}</h1>
       <h1>Nickname: {displayName}</h1>
       <button onClick={() => navigate("/new-game")}>New Game</button>
-      <button onClick={console.log("Join Game")}>Join Game</button>
-      <button onClick={console.log("Inv")}>Invitations</button>
+      {/* <button onClick={() => pass}>Join Game</button>
+      <button onClick={() => pass}>Invitations</button> */}
       <button onClick={() => navigate("/profile")}>Profile</button>
       <button onClick={() => navigate("/friends")}>Friends</button>
       <button onClick={async () => await supabase.auth.signOut()}>
