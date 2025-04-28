@@ -49,6 +49,7 @@ export default function Profile() {
       );
       if (result.success) {
         console.log("Public URL:", result.publicUrl);
+        setAvatarUrl(result.publicUrl);
       }
     } catch (error) {
       console.error("Error updating profile picture:", error.message);
