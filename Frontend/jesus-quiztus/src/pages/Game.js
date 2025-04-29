@@ -11,11 +11,10 @@ import { supabase } from "../supabaseClient";
 
 export default function Game() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [questions, setQuestions] = useState([]);
   const { displayName, session } = useUser();
 
+
+  // Handling the form for setting up a new game
   const handleStart = async (formData) => {
     const {
       data: { session: authSession },
@@ -33,6 +32,10 @@ export default function Game() {
 
 
     try {
+      // awaiting results from the API-req startGame. 
+      // Then navigating the user to the game lobby for that game.
+      // TODO:
+      // Should maybe check that this is a valid gameID?
       const result = await startGame(formData, authSession.access_token);
       navigate(`/lobby/${result.gameId}`);
     } catch (error) {
@@ -48,11 +51,7 @@ export default function Game() {
     <div>
       <h1>New Game</h1>
       <p>Please setup your choices or stuffs, {displayName}!</p>
-
-      {loading && <p>Loading questions...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {!loading && <GameSetupForm onStart={handleStart} />}
+      <GameSetupForm onStart={handleStart} />
     </div>
   );
 }

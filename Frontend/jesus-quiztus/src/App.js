@@ -1,6 +1,4 @@
-// App.js eller App.tsx
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import Home from "./pages/Home";
 import Signup from "./components/Signup";
 import Login from "./components/LoginForm";
@@ -8,19 +6,24 @@ import Game from "./pages/Game";
 import Profile from "./pages/Profile";
 import Friends from "./pages/Friends";
 import GameLobby from "./pages/GameLobby";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { UserProvider } from "./context/UserContext";
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { UserProvider, useUser} from "./context/UserContext";
 
+/*
 const supabase = createClient(
   //TODO: använd miljövariabler istället för att hårdkoda
   //process.env.SUPABASE_URL,
   "https://rixhhkmrhhmiajvxrfli.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDAxODcwOCwiZXhwIjoyMDU5NTk0NzA4fQ.RkbgDMDjUyJGr4Ilg4ppvBbQog3JX3yv8899tbpcyAc"
 );
+*/
 
 export default function App() {
   const [messages, setMessages] = useState([]);
-  const [session, setSession] = useState(null);
+  //const [session, setSession] = useState(null);
+  const { supabase } = useUser();
+
+
 
   const sendMessage = async () => {
     await fetch(
@@ -31,7 +34,7 @@ export default function App() {
       }
     );
   };
-
+  
   useEffect(() => {
     const channel = supabase
       .channel("realtime-messages")
@@ -50,6 +53,7 @@ export default function App() {
     };
   }, []);
 
+  /*
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -61,8 +65,9 @@ export default function App() {
     });
     return () => subscription.unsubscribe();
   }, []);
+  */
 
-  console.log("App laddades!");
+  //console.log("App laddades!");
 
   // return (
   //   <div>

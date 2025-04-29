@@ -1,4 +1,4 @@
-import { createContext, use, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 
 /**
@@ -56,7 +56,7 @@ export const UserProvider = ({ children }) => {
   }, [session]);
 
   return (
-    <UserContext.Provider value={{ session, displayName, userId }}>
+    <UserContext.Provider value={{ session, displayName, userId, supabase }}>
       {children}
     </UserContext.Provider>
   );
