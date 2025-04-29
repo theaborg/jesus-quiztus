@@ -10,6 +10,7 @@ import Friends from "./pages/Friends";
 import GameLobby from "./pages/GameLobby";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
+import "./styles/App.scss";
 
 const supabase = createClient(
   //TODO: använd miljövariabler istället för att hårdkoda

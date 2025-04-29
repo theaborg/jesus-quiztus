@@ -1,0 +1,82 @@
+$background-color: #f7f3a7;
+$accent-color: #ffc600;
+
+body {
+  background-color: $background-color;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+// General input style
+.input,
+.input-div {
+  display: block;
+  margin: 0.5em auto;
+  padding: 0.75em;
+  border-radius: 5em;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+}
+
+// Grid layout for login/register buttons
+.login-register-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Ensure buttons are evenly spaced */
+  grid-gap: 20px;
+  width: 100%; /* Take up full available width */
+  padding: 1em;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.login-button,
+.register-button {
+  padding: 1em 2em;
+  font-size: 1.1rem;
+  border-radius: 2em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button {
+  background-color: $accent-color; /* Green */
+  color: black;
+}
+
+.register-button {
+  background-color: black; /* Red */
+  color: white;
+}
+
+// Login form layout
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 90%;
+  max-width: 400px;
+  margin: 1em auto;
+}
+
+// Optional line-break classes
+.auto {
+  line-break: auto;
+}
+.loose {
+  line-break: loose;
+}
+.normal {
+  line-break: normal;
+}
+.strict {
+  line-break: strict;
+}
+.anywhere {
+  line-break: anywhere;
+}
