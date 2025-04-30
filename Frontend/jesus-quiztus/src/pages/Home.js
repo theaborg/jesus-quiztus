@@ -40,8 +40,8 @@ export default function Home() {
       <h1>Welcome {session.user.email}</h1>
       <h1>Nickname: {displayName}</h1>
       <button onClick={() => navigate("/new-game")}>New Game</button>
-      {/* <button onClick={() => pass}>Join Game</button>
-      <button onClick={() => pass}>Invitations</button> */}
+       <button onClick={() => navigate("/lobby")}>Join Game</button>
+      {/* <button onClick={() => pass}>Invitations</button> */}
       <button onClick={() => navigate("/profile")}>Profile</button>
       <button onClick={() => navigate("/friends")}>Friends</button>
       <button onClick={async () => await supabase.auth.signOut()}>

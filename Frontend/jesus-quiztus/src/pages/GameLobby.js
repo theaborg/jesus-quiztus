@@ -1,162 +1,162 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { initGame } from "../api/initGame";
 import { supabase } from "../supabaseClient";
-import { useNavigate } from "react-router-dom";
+
+import LobbyView from "../components/LobbyView";
+import ResultView from "../components/ResultView";
+import QuestionView from "../components/QuestionsView";
+
+import { fetchGameDetails } from "../CRUD/games";
+import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
 
 const GameLobby = () => {
-  const { gameId } = useParams(); // Hämtar gameId från URL:en
-  const [questions, setQuestions] = useState([]); // Frågor
-  const [loading, setLoading] = useState(true); // Kanske onödig? Visar laddskärm
-  const [isReady, setIsReady] = useState(false); // Kollar att user är redo att köra igång spelet
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Håller koll på vilken fråga vi är på
-  const navigate = useNavigate(); // Så vi kan komma tillbaka till start
+  const { gameId } = useParams();
+  const navigate = useNavigate();
+  const { userId, displayName } = useUser();
 
-  const [answers, setAnswers] = useState([]); // Sparar användarens svar på varje fråga
+  const [hostId, setHostId] = useState(null);
+  const [gameState, setGameState] = useState("waiting");
+  const [questionSetId, setQuestionSetId] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // När komponenten laddas, hämta frågorna som hör till spelet
+  /**
+ * Hanterar den enkilde spelarens lobbyvy.
+ * 
+ * Flöde och funktion:
+ * 1. Hämtar `gameId` från URL-parametrar och säkerställer att den är giltig.
+ * 2. Laddar speldetaljer från databasen (host, status och frågeset).
+ * 3. Om spelet är aktivt ("active"), laddas frågorna från databasen.
+ * 4. Lyssnar i realtid på förändringar i spelets status (via Supabase channel).
+ * 5. Renderar olika vyer beroende på status:
+ *    - "waiting": visar LobbyView med startknapp för host.
+ *    - "active": visar frågorna en i taget med QuestionView.
+ *    - "over" eller när alla frågor är besvarade: visar ResultView.
+ * 6. Användaren svarar på frågor en efter en, och deras svar loggas lokalt.
+ * 7. När spelet är slut visas resultat tills spelaren väljer att gå tillbaka till start.
+ */
+
   useEffect(() => {
-    const fetchQuestions = async () => {
+    if (!gameId || gameId === "undefined") {
+      console.warn("Ingen gameId angiven i URL.");
+      navigate("/");
+    }
+  }, [gameId, navigate]);
+
+  useEffect(() => {
+    if (!gameId) return;
+
+    const loadGameDetails = async () => {
       try {
-        // Steg 1: Hämta question_set ID från games-tabellen
-        const { data: gameData, error: gameError } = await supabase
-          .from("games")
-          .select("question_set")
-          .eq("id", gameId)
-          .single(); // Förväntar oss bara en rad
+        const data = await fetchGameDetails(gameId);
 
-        if (gameError) throw gameError;
+        setHostId(data.host);
+        setGameState(data.state);
+        setQuestionSetId(data.question_set);
 
-        const questionSetId = gameData.question_set;
+        if (data.state === "active") {
+          const formatted = await fetchQuestionsFromDb(data.question_set);
+          setQuestions(formatted);
+        }
 
-        // Steg 2: Hämta alla frågor till settet
-        const { data: questionsData, error: questionsError } = await supabase
-          .from("Questions")
-          .select("*")
-          .eq("set", questionSetId)
-          .order("id", { ascending: true }); // Sorterar frågorna, kanske onödigt?
-
-        if (questionsError) throw questionsError;
-
-        // Steg 3: Formatera frågorna så att de passar vår UI
-        const formattedQuestions = questionsData.map((q) => ({
-          text: q.question,
-          alternatives: shuffle([q.answer, q.alt_1, q.alt_2, q.alt_3]), // Blanda alternativen, annars är alltid svar 1 rätt
-          correct: q.answer,
-        }));
-
-        //console.log("Loaded formatted questions:", formattedQuestions);
-        setQuestions(formattedQuestions);
+        setLoading(false);
       } catch (error) {
-        console.error("Error loading game questions:", error);
+        console.error("Kunde inte hämta game-data:", error);
       }
-
-      setLoading(false); // Sluta visa laddningsskärm
     };
 
-    fetchQuestions();
+    loadGameDetails();
   }, [gameId]);
 
-  // kastar om svaren
-  const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+  useEffect(() => {
+    if (!gameId) return;
 
-  // Visa laddningsskärm om frågorna inte hunnit hämtas än
-  if (loading) {
-    return <div>Loading game data...</div>;
-  }
+    const channel = supabase
+      .channel("game_state_channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "games",
+          filter: `id=eq.${gameId}`,
+        },
+        async (payload) => {
+          const newState = payload.new.state;
+          setGameState(newState);
 
-  // Visa "I'm Ready!"-knapp innan spelet startar
-  if (!isReady) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <h2 className="text-xl mb-4">LE'Z GO!</h2>
-        <button
-          onClick={() => setIsReady(true)} // När användaren är redo, börja spelet
-        >
-          I'm Ready!
-        </button>
-      </div>
-    );
-  }
-
-  // Om alla frågor är avklarade, visa resultat
-  if (currentQuestionIndex >= questions.length) {
-    return (
-      <div className="p-4 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center">Results 🎉</h2>
-        <ul className="space-y-4">
-          {answers.map((answer, index) => {
-            const question = questions[answer.questionIndex];
-            const isCorrect = answer.selected === answer.correct;
-            return (
-              <li key={index} className="border rounded-lg p-4">
-                <p
-                  className="font-semibold mb-1"
-                  dangerouslySetInnerHTML={{
-                    __html: `Q${index + 1}: ${question.text}`,
-                  }}
-                />
-                <p>
-                  ✅ Rätt svar:{" "}
-                  <span
-                    className="font-medium"
-                    dangerouslySetInnerHTML={{ __html: answer.correct }}
-                  />
-                </p>
-                <p>
-                  🧍 Ditt svar:{" "}
-                  <span
-                    className={`font-medium ${
-                      isCorrect ? "text-green-600" : "text-red-600"
-                    }`}
-                    dangerouslySetInnerHTML={{ __html: answer.selected }}
-                  />{" "}
-                  {isCorrect ? "✔️" : "❌"}
-                </p>
-              </li>
+          if (newState === "active") {
+            const formatted = await fetchQuestionsFromDb(
+              payload.new.question_set
             );
-          })}
-        </ul>
-        <button onClick={() => navigate("/")}>Till startsidan</button>
-      </div>
+            setQuestions(formatted);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [gameId]);
+
+  const handleStartGame = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      console.error("Ingen session hittades.");
+      return;
+    }
+
+    await initGame(gameId, questionSetId, session.access_token);
+  };
+
+  const handleAnswer = (selected) => {
+    setAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestionIndex,
+        selected,
+        correct: questions[currentQuestionIndex].correct,
+      },
+    ]);
+    setCurrentQuestionIndex((prev) => prev + 1);
+  };
+
+  if (loading) return <div>Laddar spel...</div>;
+
+  if (gameState !== "active") {
+    return (
+      <LobbyView
+        isHost={userId === hostId}
+        onStart={handleStartGame}
+        displayName={displayName}
+      />
     );
   }
 
-  // Visa aktuell fråga och svarsalternativ
-  const question = questions[currentQuestionIndex];
+  if (gameState === "over" || currentQuestionIndex >= questions.length) {
+    return (
+      <ResultView
+        answers={answers}
+        questions={questions}
+        navigateHome={() => navigate("/")}
+      />
+    );
+  }
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl mb-4">Fråga {currentQuestionIndex + 1}</h2>
-      {/*<p className="mb-6 text-lg">{question.text}</p> */}
-      <p
-        className="mb-6 text-lg"
-        dangerouslySetInnerHTML={{ __html: question.text }}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {question.alternatives.map((alt, index) => (
-          <button
-            key={index}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
-            onClick={() => {
-              // Spara svaret
-              setAnswers((prev) => [
-                ...prev,
-                {
-                  questionIndex: currentQuestionIndex,
-                  selected: alt,
-                  correct: question.correct,
-                },
-              ]);
-              // Gå vidare till nästa fråga direkt
-              setCurrentQuestionIndex((prev) => prev + 1);
-            }}
-          >
-            <span dangerouslySetInnerHTML={{ __html: alt }} />
-          </button>
-        ))}
-      </div>
-    </div>
+    <QuestionView
+      question={questions[currentQuestionIndex]}
+      questionNumber={currentQuestionIndex + 1}
+      onAnswer={handleAnswer}
+    />
   );
 };
 

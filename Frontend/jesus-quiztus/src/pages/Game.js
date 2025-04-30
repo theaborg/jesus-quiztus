@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
-import { startGame } from "../api/startGame";
+import { createGame } from "../api/createGame";
 import GameSetupForm from "../components/GameSetup";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient"; 
@@ -36,7 +36,7 @@ export default function Game() {
       // Then navigating the user to the game lobby for that game.
       // TODO:
       // Should maybe check that this is a valid gameID?
-      const result = await startGame(formData, authSession.access_token);
+      const result = await createGame(formData, authSession.access_token);
       navigate(`/lobby/${result.gameId}`);
     } catch (error) {
       alert(error.message);
