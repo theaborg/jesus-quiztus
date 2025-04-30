@@ -9,18 +9,10 @@ import GameLobby from "./pages/GameLobby";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import { UserProvider, useUser} from "./context/UserContext";
 
-/*
-const supabase = createClient(
-  //TODO: använd miljövariabler istället för att hårdkoda
-  //process.env.SUPABASE_URL,
-  "https://rixhhkmrhhmiajvxrfli.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NDAxODcwOCwiZXhwIjoyMDU5NTk0NzA4fQ.RkbgDMDjUyJGr4Ilg4ppvBbQog3JX3yv8899tbpcyAc"
-);
-*/
+
 
 export default function App() {
   const [messages, setMessages] = useState([]);
-  //const [session, setSession] = useState(null);
   const { supabase } = useUser();
 
 
@@ -101,6 +93,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/lobby/:gameId" element={<GameLobby />} />
+            <Route path="/lobby" element={<GameLobby />} />
           </Routes>
         </UserProvider>
       </div>

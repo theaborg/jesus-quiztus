@@ -7,6 +7,8 @@ import { supabase } from "../supabaseClient";
  * Currently shared:
  *  - Session
  *  - Displayname
+ *  - UserId
+ *  - Supabase client
  */
 
 const UserContext = createContext();
