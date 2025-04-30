@@ -58,9 +58,6 @@ const GameSetupForm = ({ onStart }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormData({
-      encoding: "",
-    });
     onStart(formData);
   };
 

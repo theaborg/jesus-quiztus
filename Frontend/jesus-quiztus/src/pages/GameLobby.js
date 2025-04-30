@@ -15,8 +15,18 @@ const GameLobby = () => {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 1. Hämta game-info inkl. host och state
+  // ✅ 1. Navigera bort om gameId är ogiltigt
   useEffect(() => {
+    if (!gameId || gameId === "undefined") {
+      console.warn("Ingen gameId angiven i URL.");
+      navigate("/");
+    }
+  }, [gameId, navigate]);
+
+  // ✅ 2. Hämta game-info inkl. host och state
+  useEffect(() => {
+    if (!gameId || gameId === "undefined") return;
+
     const fetchGameDetails = async () => {
       const { data, error } = await supabase
         .from("games")
@@ -42,8 +52,10 @@ const GameLobby = () => {
     fetchGameDetails();
   }, [gameId]);
 
-  // 🔹 2. Lyssna i realtid på state = "active"
+  // ✅ 3. Lyssna i realtid på ändringar i game.state
   useEffect(() => {
+    if (!gameId || gameId === "undefined") return;
+
     const channel = supabase
       .channel("game_state_channel")
       .on(
@@ -56,6 +68,7 @@ const GameLobby = () => {
         },
         async (payload) => {
           const newState = payload.new.state;
+          console.log("Game state updated:", newState);
           setGameState(newState);
 
           if (newState === "active") {
@@ -70,7 +83,6 @@ const GameLobby = () => {
     };
   }, [gameId]);
 
-  // 🔹 3. Hämta frågorna om spelet är aktivt
   const fetchQuestions = async (questionSetId) => {
     const { data, error } = await supabase
       .from("Questions")
@@ -111,9 +123,10 @@ const GameLobby = () => {
                 .from("games")
                 .update({ state: "active" })
                 .eq("id", gameId);
-
               if (error) {
                 console.error("Kunde inte starta spelet:", error);
+              } else {
+                console.log("Game state updated: active");
               }
             }}
           >
