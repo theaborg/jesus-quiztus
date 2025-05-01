@@ -1,0 +1,44 @@
+.default-header-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  padding: 1em;
+  flex-wrap: wrap;
+  padding: 1em;
+}
+
+.login-header-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+}
+
+.default-header-img {
+  width: 10%;
+  max-width: 230px;
+  height: auto;
+  pointer-events: none;
+}
+
+.login-header-img {
+  width: 45%;
+  max-width: 300px;
+  height: auto;
+  pointer-events: none;
+}
+
+.header-text {
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 0.5em 0;
+  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-header-img {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}

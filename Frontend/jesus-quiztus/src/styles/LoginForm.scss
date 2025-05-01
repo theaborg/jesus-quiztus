@@ -1,31 +1,6 @@
 $background-color: #f7f3a7;
 $accent-color: #ffc600;
 
-// .header-image {
-//   width: 60%;
-//   max-width: 230px;
-//   height: auto;
-//   pointer-events: none;
-// }
-
-.login-header-div {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1em;
-}
-.login-header-img {
-  width: 45%;
-  max-width: 300px;
-  height: auto;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .login-header-img {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
 .input,
 .input-div {
   display: block;

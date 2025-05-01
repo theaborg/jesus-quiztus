@@ -12,31 +12,6 @@ body {
   text-align: center;
 }
 
-.header-div {
-  display: flex;
-  align-items: center;
-  justify-content: center; /* horizontally center content as a group */
-  gap: 1em; /* space between header text and image */
-  padding: 1em;
-  flex-wrap: wrap; /* allows wrapping on smaller screens */
-  padding: 1em;
-}
-
-.header {
-  font-size: 3rem;
-  font-weight: bold;
-  text-align: center;
-  margin: 0.5em 0;
-  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
-}
-
-.default-header-img {
-  width: 10%;
-  max-width: 230px;
-  height: auto;
-  pointer-events: none;
-}
-
 .App-link {
   color: #61dafb;
 }

@@ -1,4 +1,5 @@
 import { useUser } from "../context/UserContext";
+import "../styles/Header.scss";
 
 export default function Header() {
   const { session, userId } = useUser();
@@ -16,7 +17,7 @@ export default function Header() {
         src="temp_logo.png"
         alt="Jesus"
       />
-      <h1 className="header">Jesus Quiztus</h1>
+      <h1 className="header-text">Jesus Quiztus</h1>
     </div>
   );
 }
