@@ -6,17 +6,14 @@ import Game from "./pages/Game";
 import Profile from "./pages/Profile";
 import Friends from "./pages/Friends";
 import GameLobby from "./pages/GameLobby";
-import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import { UserProvider, useUser} from "./context/UserContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { UserProvider, useUser } from "./context/UserContext";
 import "./styles/App.scss";
-
-
+import Header from "./components/Header";
 
 export default function App() {
   const [messages, setMessages] = useState([]);
   const { supabase } = useUser();
-
-
 
   const sendMessage = async () => {
     await fetch(
@@ -27,7 +24,7 @@ export default function App() {
       }
     );
   };
-  
+
   useEffect(() => {
     const channel = supabase
       .channel("realtime-messages")
@@ -46,45 +43,10 @@ export default function App() {
     };
   }, []);
 
-  /*
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-  */
-
-  //console.log("App laddades!");
-
-  // return (
-  //   <div>
-  //     {!session && (
-  //       <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
-  //     )}
-
-  //     <div>
-  //       {session ? <p>Logged in!</p> : <p>Not logged in</p>}
-  //       <button onClick={sendMessage}>Skicka meddelande</button>
-  //       <button onClick={createUser}>Skapa användare</button>
-  //       <ul>
-  //         {messages.map((msg) => (
-  //           <li key={msg.id}>{msg.content}</li>
-  //         ))}
-  //       </ul>
-  //     </div>
-  //   </div>
-  // );
-
   return (
     <Router>
       <div>
-        <h1>Jesus Quiztus!</h1>
+        <Header />
         <UserProvider>
           <Routes>
             <Route path="/" element={<Home />} />

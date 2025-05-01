@@ -49,7 +49,6 @@ export default function LoginForm() {
 
   return (
     <div>
-      <h2>Login</h2>
       <form onSubmit={handleLogin} className="login-form">
         <div className="input-div">
           {message}
