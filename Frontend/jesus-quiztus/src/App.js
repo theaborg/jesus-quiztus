@@ -8,6 +8,7 @@ import Friends from "./pages/Friends";
 import GameLobby from "./pages/GameLobby";
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import { UserProvider, useUser} from "./context/UserContext";
+import "./styles/App.scss";
 
 
 

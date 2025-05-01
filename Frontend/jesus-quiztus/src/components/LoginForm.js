@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../supabaseClient";
+import "../styles/LoginForm.scss";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -49,28 +50,42 @@ export default function LoginForm() {
   return (
     <div>
       <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+      <form onSubmit={handleLogin} className="login-form">
+        <div className="input-div">
+          {message}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="input"
+          />
+        </div>
+        <div className="input-div">
+          {message}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="input"
+          />
+        </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </button>
-        <button onClick={handleSignUp}>
-          {loading ? "Registering ..." : "Register"}
-        </button>
+        <div className="login-register-buttons">
+          <div className="login-button-div">
+            <button type="submit" disabled={loading} className="login-button">
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </div>
+          <div className="register-button-div">
+            <button onClick={handleSignUp} className="register-button">
+              {loading ? "Registering ..." : "Register"}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
