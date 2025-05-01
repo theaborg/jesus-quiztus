@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
 import LoginForm from "../components/LoginForm";
-import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import Navigation from "../components/Navigation";
 
 export default function Home() {
   //const [session, setSession] = useState(null);
   const { displayName, session } = useUser();
-  const navigate = useNavigate();
 
   /*
   useEffect(() => {
@@ -37,16 +35,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Welcome {session.user.email}</h1>
-      <h1>Nickname: {displayName}</h1>
-      <button onClick={() => navigate("/new-game")}>New Game</button>
-       <button onClick={() => navigate("/lobby")}>Join Game</button>
-      {/* <button onClick={() => pass}>Invitations</button> */}
-      <button onClick={() => navigate("/profile")}>Profile</button>
-      <button onClick={() => navigate("/friends")}>Friends</button>
-      <button onClick={async () => await supabase.auth.signOut()}>
-        Log Out
-      </button>
+      <Navigation />
     </div>
   );
 }

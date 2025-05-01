@@ -1,5 +1,4 @@
-$background-color: #f7f3a7;
-$accent-color: #ffc600;
+@use "./colors" as *;
 
 body {
   background-color: $background-color;

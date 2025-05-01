@@ -1,0 +1,26 @@
+@use "./colors" as *;
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+}
+
+.nav-button {
+  background-color: $second-accent-color;
+  color: $text-on-second-accent-color;
+
+  width: 20%;
+  max-width: 400px;
+
+  margin: 0.5em auto;
+  padding: 0.9rem;
+  border-radius: 2em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 1.6rem;
+
+  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+}
