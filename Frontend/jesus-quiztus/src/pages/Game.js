@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { createGame } from "../api/createGame";
-import GameSetupForm from "../components/GameSetup";
+import GameSetupForm from "../components/GameSetupForm";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient"; 
+import { supabase } from "../supabaseClient";
 
 /**
  *
@@ -12,7 +12,6 @@ import { supabase } from "../supabaseClient";
 export default function Game() {
   const navigate = useNavigate();
   const { displayName, session } = useUser();
-
 
   // Handling the form for setting up a new game
   const handleStart = async (formData) => {
@@ -30,9 +29,8 @@ export default function Game() {
     //console.log("Frontend session from auth:", authSession);
     //console.log("Token:", authSession?.access_token);
 
-
     try {
-      // awaiting results from the API-req startGame. 
+      // awaiting results from the API-req startGame.
       // Then navigating the user to the game lobby for that game.
       // TODO:
       // Should maybe check that this is a valid gameID?
@@ -49,8 +47,7 @@ export default function Game() {
 
   return (
     <div>
-      <h1>New Game</h1>
-      <p>Please setup your choices or stuffs, {displayName}!</p>
+      <h1 className="second-header-text">New Game</h1>
       <GameSetupForm onStart={handleStart} />
     </div>
   );

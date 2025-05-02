@@ -1,0 +1,50 @@
+@use "./colors" as *;
+
+// TODO: fix this form, it's ugly but I can't figure it out
+.game-setup-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0em auto;
+  max-width: 500px;
+}
+
+.game-setup-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+  margin: 1em auto;
+  width: 90%;
+  max-width: 500px;
+}
+
+.game-setup-input {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  align-self: right;
+  text-align: center;
+  margin: 0.5em 0;
+  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+}
+
+.input-label {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  width: 100%;
+  margin: 0.5em 0;
+  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+}
+
+.start-game-button {
+  padding: 1em 2em;
+  font-size: 1.1rem;
+  border-radius: 2em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  background-color: $first-accent-color;
+  color: black;
+  width: 50%;
+}

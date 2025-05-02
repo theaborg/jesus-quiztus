@@ -23,3 +23,27 @@ body {
     transform: rotate(360deg);
   }
 }
+
+// Should this be moved?
+.second-header-text {
+  font-size: 2.4rem;
+  font-weight: lighter;
+  text-align: center;
+  margin: 0.1em 0;
+  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+}
+
+.in-app-button {
+  width: 100%;
+  max-width: 400px;
+  font-size: 1.5rem;
+  padding: 0.6em 1em;
+  margin-bottom: 2em;
+  border-radius: 1rem;
+  border: none;
+  background-color: $first-accent-color;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: "Bebas Neue", sans-serif;
+}
