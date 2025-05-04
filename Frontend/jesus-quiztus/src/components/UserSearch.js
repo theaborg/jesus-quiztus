@@ -1,23 +1,22 @@
-import { useState } from 'react';
-import { supabase } from '../supabaseClient';
-import { useUser } from '../context/UserContext';
-import { addFriend } from '../api/addFriend';
+import { useState } from "react";
+import { supabase } from "../supabaseClient";
+import { useUser } from "../context/UserContext";
+import { addFriend } from "../api/addFriend";
+import "../styles/UserSearch.scss";
 
 const UserSearch = ({ currentUserId }) => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [addedIds, setAddedIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const { session, userId } = useUser();
 
-  
-
   const handleSearch = async () => {
     setLoading(true);
     const { data, error } = await supabase
-    .from('users')
-    .select('id, nickname')
-    .ilike('nickname', `%${search}%`);
+      .from("users")
+      .select("id, nickname")
+      .ilike("nickname", `%${search}%`);
 
     if (error) {
       console.error(error);
@@ -50,44 +49,50 @@ const UserSearch = ({ currentUserId }) => {
       const result = await addFriend(friendId, userId, session.access_token);
       if (result.success) {
         setAddedIds([...addedIds, friendId]);
-        alert('Friend request sent successfully!');
+        alert("Friend request sent successfully!");
       }
     } catch (error) {
-      console.error('Error sending friend request:', error.message);
-      alert('Something went wrong. Please try again.');
+      console.error("Error sending friend request:", error.message);
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Search Users</h2>
-      <div>
-        <input
-          type="text"
-          placeholder="Enter nickname"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
+    <div className="user-search-container">
+      <p>Friends will go here</p>
+      <label className="second-header-text">Search Users</label>
+
+      <input
+        className="edit-nickname-input"
+        type="text"
+        placeholder="Enter nickname"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
       {loading && <p>Searching...</p>}
 
       <ul>
         {results.map((user) => (
           <li key={user.id}>
-            {user.nickname}{' '}
+            {user.nickname}{" "}
             <button
-                onClick={() => handleAddFriend(user.id)}
-                disabled={addedIds.includes(user.id)}
-              >
-                {addedIds.includes(user.id) ? 'Request Sent' : 'Add Friend'}
+              onClick={() => handleAddFriend(user.id)}
+              disabled={addedIds.includes(user.id)}
+            >
+              {addedIds.includes(user.id) ? "Request Sent" : "Add Friend"}
             </button>
           </li>
         ))}
       </ul>
 
-      {results.length === 0 && !loading && <p>No users found.</p>}
+      {results.length === 0 && !loading && (
+        <p className="user-result-text">No users found.</p>
+      )}
+
+      <button className="in-app-button" onClick={handleSearch}>
+        Search
+      </button>
     </div>
   );
 };

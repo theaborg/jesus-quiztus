@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { useUser } from "../context/UserContext";
 import { createGame } from "../api/createGame";
 import GameSetupForm from "../components/GameSetupForm";
@@ -11,7 +10,7 @@ import { supabase } from "../supabaseClient";
 
 export default function Game() {
   const navigate = useNavigate();
-  const { displayName, session } = useUser();
+  const { session } = useUser();
 
   // Handling the form for setting up a new game
   const handleStart = async (formData) => {
