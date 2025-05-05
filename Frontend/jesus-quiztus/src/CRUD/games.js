@@ -11,3 +11,39 @@ export const fetchGameDetails = async (gameId) => {
 
   return data;
 };
+
+export const setGameQuestionIndex = async (gameId, questionIndex) => {
+  const { error } = await supabase
+    .from("games")
+    .update({ question_index: questionIndex })
+    .eq("id", gameId);
+
+  if (error) throw error;
+};
+
+export const getQuestionIndex = async (gameId) => {
+  const { error } = await supabase
+    .from("games")
+    .select("question_index")
+    .eq("id", gameId);
+
+  if (error) throw error;
+};
+
+export const setGameStartTime = async (gameId, time) => {
+  const { error } = await supabase
+    .from("games")
+    .update({ start_time: time })
+    .eq("id", gameId);
+
+  if (error) throw error;
+};
+
+export const getStartTime = async (gameId) => {
+  const { error } = await supabase
+    .from("games")
+    .select("start_time")
+    .eq("id", gameId);
+
+  if (error) throw error;
+};
