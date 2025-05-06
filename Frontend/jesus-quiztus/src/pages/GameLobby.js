@@ -12,16 +12,16 @@ import TimerBar from "../components/TimerBar";
 import { fetchGameDetails } from "../CRUD/games";
 import { setGameStartTime } from "../CRUD/games";
 import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
-
+import { getGameStartTime } from "../CRUD/games";
 
 /**
- * 
+ *
  * TODO:
  * - Lägg till en timer som räknar ner tiden för varje fråga.
  * - Highlighta svaren som är valda av spelaren.
  * - Se till att om spelaren inte väljer ett svar så defaultas ett felaktigt svar.
  * - spara DB osv..
- * 
+ *
  */
 
 const GameLobby = () => {
@@ -120,7 +120,7 @@ const GameLobby = () => {
 
   useEffect(() => {
     if (!gameId) return;
-  
+
     const channel = supabase
       .channel("game_state_channel")
       .on(
@@ -134,12 +134,14 @@ const GameLobby = () => {
         async (payload) => {
           const newState = payload.new.state;
           const isHost = userId === payload.new.host;
-  
+
           if (newState === "active" && prevGameStateRef.current !== "active") {
-            const formatted = await fetchQuestionsFromDb(payload.new.question_set);
+            const formatted = await fetchQuestionsFromDb(
+              payload.new.question_set
+            );
             setQuestions(formatted);
             setCurrentQuestionIndex(0);
-  
+
             if (isHost) {
               console.log("Host, starta spelet!");
               handleFirstQuestion();
@@ -147,13 +149,13 @@ const GameLobby = () => {
               console.log("Inte host, vänta på start!");
             }
           }
-  
+
           setGameState(newState);
           prevGameStateRef.current = newState;
         }
       )
       .subscribe();
-  
+
     return () => {
       supabase.removeChannel(channel);
     };
@@ -183,33 +185,67 @@ const GameLobby = () => {
   }, [startTime]);
   */
 
-  const QUESTION_DURATION = 5000;
+  function timeStringToSeconds(str) {
+    console.log("timeStringToSeconds", str);
+    const [hh, mm, ss] = str.split(":").map(Number);
+    return hh * 3600 + mm * 60 + ss;
+  }
+
+  const QUESTION_DURATION = 5;
   useEffect(() => {
     if (currentQuestionIndex >= questions.length) return;
-  
-    const start = Date.now();
-    setTimeLeft(QUESTION_DURATION);
-  
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const remaining = QUESTION_DURATION - elapsed;
-  
-      setTimeLeft(Math.max(remaining, 0));
-  
-      if (remaining <= 0) {
-        clearInterval(interval);
-        setCurrentQuestionIndex((prev) => prev + 1);
+
+    let interval;
+
+    const setupTimer = async () => {
+      // Host sets start time and saves to DB
+      const isHost = userId === hostId;
+
+      let start;
+
+      if (isHost) {
+        const newStartDate = new Date();
+        const formatted = newStartDate.toTimeString().split(" ")[0];
+        setStartTime(formatted);
+        await setGameStartTime(gameId, formatted);
+        start = formatted;
+      } else {
+        // Non-host fetches start time from DB
+        let response = await getGameStartTime(gameId);
+        while (!response || response.length === 0 || !response[0].start_time) {
+          response = await getGameStartTime(gameId);
+        }
+        start = response[0].start_time;
+        setStartTime(start);
       }
-    }, 100);
-  
+
+      // Begin countdown
+      interval = setInterval(() => {
+        const currTime = new Date().toTimeString().split(" ")[0];
+        const elapsed =
+          timeStringToSeconds(currTime) - timeStringToSeconds(start);
+        const remaining = QUESTION_DURATION - elapsed;
+
+        setTimeLeft(Math.max(remaining, 0));
+
+        if (remaining <= 0) {
+          clearInterval(interval);
+          setCurrentQuestionIndex((prev) => prev + 1);
+        }
+      }, 100);
+    };
+
+    setupTimer();
+
     return () => clearInterval(interval);
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions.length, userId, hostId, gameId]);
 
   const handleFirstQuestion = async () => {
     const currTime = new Date();
     const formattedTime = currTime.toTimeString().split(" ")[0];
 
     console.log("formattedTime", formattedTime);
+    setStartTime(formattedTime);
     await setGameStartTime(gameId, formattedTime);
   };
 
