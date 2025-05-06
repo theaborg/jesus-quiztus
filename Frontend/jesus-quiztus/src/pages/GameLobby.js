@@ -13,6 +13,17 @@ import { fetchGameDetails } from "../CRUD/games";
 import { setGameStartTime } from "../CRUD/games";
 import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
 
+
+/**
+ * 
+ * TODO:
+ * - Lägg till en timer som räknar ner tiden för varje fråga.
+ * - Highlighta svaren som är valda av spelaren.
+ * - Se till att om spelaren inte väljer ett svar så defaultas ett felaktigt svar.
+ * - spara DB osv..
+ * 
+ */
+
 const GameLobby = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
@@ -171,7 +182,7 @@ const GameLobby = () => {
     return () => clearInterval(interval);
   }, [startTime]);
   */
- 
+
   const QUESTION_DURATION = 5000;
   useEffect(() => {
     if (currentQuestionIndex >= questions.length) return;
