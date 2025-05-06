@@ -1,4 +1,9 @@
-const QuestionView = ({ question, questionNumber, onAnswer }) => {
+const QuestionView = ({
+  question,
+  questionNumber,
+  onAnswer,
+  selectedAlternative,
+}) => {
   if (!question) {
     return <div>Laddar fråga...</div>; // or just return null if you want to hide it
   }
@@ -14,7 +19,12 @@ const QuestionView = ({ question, questionNumber, onAnswer }) => {
         {question.alternatives.map((alt, index) => (
           <button
             key={index}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+            className={`px-4 py-2 border border-gray-300 rounded-lg 
+            hover:bg-gray-100
+            ${
+              selectedAlternative === alt ? "bg-green-200 border-green-400" : ""
+            }
+          `}
             onClick={() => onAnswer(alt)}
           >
             <span dangerouslySetInnerHTML={{ __html: alt }} />

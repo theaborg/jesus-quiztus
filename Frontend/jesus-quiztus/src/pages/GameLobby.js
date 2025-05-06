@@ -149,6 +149,7 @@ const GameLobby = () => {
   }, [gameId, userId]);
 
   // Timer effect: ticks and updates question or timer
+  /*
   useEffect(() => {
     if (!startTime) return;
 
@@ -169,6 +170,29 @@ const GameLobby = () => {
 
     return () => clearInterval(interval);
   }, [startTime]);
+  */
+ 
+  const QUESTION_DURATION = 5000;
+  useEffect(() => {
+    if (currentQuestionIndex >= questions.length) return;
+  
+    const start = Date.now();
+    setTimeLeft(QUESTION_DURATION);
+  
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const remaining = QUESTION_DURATION - elapsed;
+  
+      setTimeLeft(Math.max(remaining, 0));
+  
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setCurrentQuestionIndex((prev) => prev + 1);
+      }
+    }, 100);
+  
+    return () => clearInterval(interval);
+  }, [currentQuestionIndex, questions.length]);
 
   const handleFirstQuestion = async () => {
     const currTime = new Date();
