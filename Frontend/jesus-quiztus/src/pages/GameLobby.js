@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { initGame } from "../api/initGame";
@@ -7,38 +7,38 @@ import { supabase } from "../supabaseClient";
 import LobbyView from "../components/LobbyView";
 import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
+import TimerBar from "../components/TimerBar";
 
 import { fetchGameDetails } from "../CRUD/games";
+import { setGameStartTime } from "../CRUD/games";
 import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
+import { getGameStartTime } from "../CRUD/games";
+
+/**
+ *
+ * TODO:
+ * - Lägg till en timer som räknar ner tiden för varje fråga.
+ * - Highlighta svaren som är valda av spelaren.
+ * - Se till att om spelaren inte väljer ett svar så defaultas ett felaktigt svar.
+ * - spara DB osv..
+ *
+ */
 
 const GameLobby = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  const prevGameStateRef = useRef();
   const { userId, displayName } = useUser();
 
-  const [hostId, setHostId] = useState(null);
+  const [hostId, setHostId] = useState("");
   const [gameState, setGameState] = useState("waiting");
   const [questionSetId, setQuestionSetId] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  /**
- * Hanterar den enkilde spelarens lobbyvy.
- * 
- * Flöde och funktion:
- * 1. Hämtar `gameId` från URL-parametrar och säkerställer att den är giltig.
- * 2. Laddar speldetaljer från databasen (host, status och frågeset).
- * 3. Om spelet är aktivt ("active"), laddas frågorna från databasen.
- * 4. Lyssnar i realtid på förändringar i spelets status (via Supabase channel).
- * 5. Renderar olika vyer beroende på status:
- *    - "waiting": visar LobbyView med startknapp för host.
- *    - "active": visar frågorna en i taget med QuestionView.
- *    - "over" eller när alla frågor är besvarade: visar ResultView.
- * 6. Användaren svarar på frågor en efter en, och deras svar loggas lokalt.
- * 7. När spelet är slut visas resultat tills spelaren väljer att gå tillbaka till start.
- */
+  const [startTime, setStartTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(5000);
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -72,6 +72,7 @@ const GameLobby = () => {
     loadGameDetails();
   }, [gameId]);
 
+  /*
   useEffect(() => {
     if (!gameId) return;
 
@@ -87,14 +88,26 @@ const GameLobby = () => {
         },
         async (payload) => {
           const newState = payload.new.state;
-          setGameState(newState);
+          const newTime = payload.new.start_time;
+
+          if (newTime && newTime !== startTime) {
+            setStartTime(newTime);
+          }
 
           if (newState === "active") {
             const formatted = await fetchQuestionsFromDb(
               payload.new.question_set
             );
             setQuestions(formatted);
+            setCurrentQuestionIndex(0);
+
+            const isHost = userId === payload.new.host;
+            if (isHost) {
+              handleFirstQuestion();
+            }
           }
+
+          setGameState(newState);
         }
       )
       .subscribe();
@@ -102,7 +115,139 @@ const GameLobby = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [gameId]);
+  }, [gameId, startTime, userId]);
+  */
+
+  useEffect(() => {
+    if (!gameId) return;
+
+    const channel = supabase
+      .channel("game_state_channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "games",
+          filter: `id=eq.${gameId}`,
+        },
+        async (payload) => {
+          const newState = payload.new.state;
+          const isHost = userId === payload.new.host;
+
+          if (newState === "active" && prevGameStateRef.current !== "active") {
+            const formatted = await fetchQuestionsFromDb(
+              payload.new.question_set
+            );
+            setQuestions(formatted);
+            setCurrentQuestionIndex(0);
+
+            if (isHost) {
+              console.log("Host, starta spelet!");
+              handleFirstQuestion();
+            } else {
+              console.log("Inte host, vänta på start!");
+            }
+          }
+
+          setGameState(newState);
+          prevGameStateRef.current = newState;
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [gameId, userId]);
+
+  // Timer effect: ticks and updates question or timer
+  /*
+  useEffect(() => {
+    if (!startTime) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const start = new Date(startTime).getTime();
+      const elapsed = now - start;
+      const remaining = 5000 - elapsed;
+
+      setTimeLeft(Math.max(remaining, 0));
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setStartTime(new Date()); // reset for next question
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+  */
+
+  function timeStringToSeconds(str) {
+    console.log("timeStringToSeconds", str);
+    const [hh, mm, ss] = str.split(":").map(Number);
+    return hh * 3600 + mm * 60 + ss;
+  }
+
+  const QUESTION_DURATION = 5;
+  useEffect(() => {
+    if (currentQuestionIndex >= questions.length) return;
+
+    let interval;
+
+    const setupTimer = async () => {
+      // Host sets start time and saves to DB
+      const isHost = userId === hostId;
+
+      let start;
+
+      if (isHost) {
+        const newStartDate = new Date();
+        const formatted = newStartDate.toTimeString().split(" ")[0];
+        setStartTime(formatted);
+        await setGameStartTime(gameId, formatted);
+        start = formatted;
+      } else {
+        // Non-host fetches start time from DB
+        let response = await getGameStartTime(gameId);
+        while (!response || response.length === 0 || !response[0].start_time) {
+          response = await getGameStartTime(gameId);
+        }
+        start = response[0].start_time;
+        setStartTime(start);
+      }
+
+      // Begin countdown
+      interval = setInterval(() => {
+        const currTime = new Date().toTimeString().split(" ")[0];
+        const elapsed =
+          timeStringToSeconds(currTime) - timeStringToSeconds(start);
+        const remaining = QUESTION_DURATION - elapsed;
+
+        setTimeLeft(Math.max(remaining, 0));
+
+        if (remaining <= 0) {
+          clearInterval(interval);
+          setCurrentQuestionIndex((prev) => prev + 1);
+        }
+      }, 100);
+    };
+
+    setupTimer();
+
+    return () => clearInterval(interval);
+  }, [currentQuestionIndex, questions.length, userId, hostId, gameId]);
+
+  const handleFirstQuestion = async () => {
+    const currTime = new Date();
+    const formattedTime = currTime.toTimeString().split(" ")[0];
+
+    console.log("formattedTime", formattedTime);
+    setStartTime(formattedTime);
+    await setGameStartTime(gameId, formattedTime);
+  };
 
   const handleStartGame = async () => {
     const {
@@ -126,7 +271,6 @@ const GameLobby = () => {
         correct: questions[currentQuestionIndex].correct,
       },
     ]);
-    setCurrentQuestionIndex((prev) => prev + 1);
   };
 
   if (loading) return <div>Laddar spel...</div>;
@@ -152,11 +296,14 @@ const GameLobby = () => {
   }
 
   return (
-    <QuestionView
-      question={questions[currentQuestionIndex]}
-      questionNumber={currentQuestionIndex + 1}
-      onAnswer={handleAnswer}
-    />
+    <div>
+      <QuestionView
+        question={questions[currentQuestionIndex]}
+        questionNumber={currentQuestionIndex + 1}
+        onAnswer={handleAnswer}
+      />
+      <TimerBar timeLeft={timeLeft} />
+    </div>
   );
 };
 
