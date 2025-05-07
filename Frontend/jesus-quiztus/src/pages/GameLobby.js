@@ -39,6 +39,8 @@ const GameLobby = () => {
   const [loading, setLoading] = useState(true);
   const [startTime, setStartTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(5000);
+  const [streak, setStreak] = useState(0);
+  const [players, setPlayers] = useState([]);
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -71,6 +73,14 @@ const GameLobby = () => {
 
     loadGameDetails();
   }, [gameId]);
+
+  useEffect(() => {
+    console.log("Streak useeffect:", streak);
+    if (streak >= 3) {
+      console.log("🔥 3 in a row!");
+      // Do something here: trigger bonus, sound, UI effect, etc.
+    }
+  }, [streak]);
 
   /*
   useEffect(() => {
@@ -186,7 +196,6 @@ const GameLobby = () => {
   */
 
   function timeStringToSeconds(str) {
-    console.log("timeStringToSeconds", str);
     const [hh, mm, ss] = str.split(":").map(Number);
     return hh * 3600 + mm * 60 + ss;
   }
@@ -263,6 +272,18 @@ const GameLobby = () => {
   };
 
   const handleAnswer = (selected) => {
+    console.log("Selected answer:", selected);
+    console.log("correct answer:", questions[currentQuestionIndex].correct);
+
+    // räcker detta?
+    const correct = questions[currentQuestionIndex].correct;
+    let newStreak = selected === correct ? streak + 1 : 0;
+    setStreak(newStreak);
+
+    console.log("Selected answer:", selected);
+    console.log("Correct answer:", correct);
+    console.log("New streak:", newStreak);
+
     setAnswers((prev) => [
       ...prev,
       {

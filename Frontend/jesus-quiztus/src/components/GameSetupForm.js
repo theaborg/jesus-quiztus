@@ -14,7 +14,7 @@ import "../styles/GameSetupForm.scss";
 
 const GameSetupForm = ({ onStart }) => {
   const [formData, setFormData] = useState({
-    amount: 10,
+    amount: 5,
     category: "",
     difficulty: "",
     type: "",
