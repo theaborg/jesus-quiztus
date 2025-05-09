@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, React } from "react";
 import Home from "./pages/Home";
 import Signup from "./components/Signup";
 import Login from "./components/LoginForm";
@@ -13,7 +13,7 @@ import Header from "./components/Header";
 
 export default function App() {
   const [messages, setMessages] = useState([]);
-  const { supabase } = useUser();  
+  const { supabase } = useUser();
 
   const sendMessage = async () => {
     await fetch(
@@ -46,7 +46,7 @@ export default function App() {
   return (
     <Router>
       <div>
-        <Header/>
+        <Header />
         <UserProvider>
           <Routes>
             <Route path="/" element={<Home />} />

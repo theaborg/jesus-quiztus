@@ -3,21 +3,22 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { initGame } from "../api/initGame";
 import { supabase } from "../supabaseClient";
-
+import Modal from "../components/Modal";
 import LobbyView from "../components/LobbyView";
 import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
 import TimerBar from "../components/TimerBar";
+import { setGame } from "../CRUD/users";
 
 import { fetchGameDetails } from "../CRUD/games";
 import { setGameStartTime } from "../CRUD/games";
 import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
 import { getGameStartTime } from "../CRUD/games";
+import { getActivePlayers } from "../CRUD/games";
 
 /**
  *
  * TODO:
- * - Lägg till en timer som räknar ner tiden för varje fråga.
  * - Highlighta svaren som är valda av spelaren.
  * - Se till att om spelaren inte väljer ett svar så defaultas ett felaktigt svar.
  * - spara DB osv..
@@ -37,6 +38,7 @@ const GameLobby = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(5000);
   const [streak, setStreak] = useState(0);
@@ -74,59 +76,42 @@ const GameLobby = () => {
     loadGameDetails();
   }, [gameId]);
 
+  /*
+  Fetching players every second waiting for game to start
+  */
   useEffect(() => {
+    if (gameState !== "pending") return;
+
+    const interval = setInterval(async () => {
+      const activePlayers = await getActivePlayers(gameId);
+      setPlayers(activePlayers || []);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [gameState, gameId]);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      let players = await getActivePlayers(gameId);
+      setPlayers(players);
+      console.log("Players in game:", players);
+    };
+
     console.log("Streak useeffect:", streak);
     if (streak >= 3) {
-      console.log("🔥 3 in a row!");
+      fetchPlayers();
+      handleOpen();
       // Do something here: trigger bonus, sound, UI effect, etc.
     }
   }, [streak]);
 
-  /*
-  useEffect(() => {
-    if (!gameId) return;
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-    const channel = supabase
-      .channel("game_state_channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "games",
-          filter: `id=eq.${gameId}`,
-        },
-        async (payload) => {
-          const newState = payload.new.state;
-          const newTime = payload.new.start_time;
-
-          if (newTime && newTime !== startTime) {
-            setStartTime(newTime);
-          }
-
-          if (newState === "active") {
-            const formatted = await fetchQuestionsFromDb(
-              payload.new.question_set
-            );
-            setQuestions(formatted);
-            setCurrentQuestionIndex(0);
-
-            const isHost = userId === payload.new.host;
-            if (isHost) {
-              handleFirstQuestion();
-            }
-          }
-
-          setGameState(newState);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [gameId, startTime, userId]);
-  */
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (!gameId) return;
@@ -170,30 +155,6 @@ const GameLobby = () => {
       supabase.removeChannel(channel);
     };
   }, [gameId, userId]);
-
-  // Timer effect: ticks and updates question or timer
-  /*
-  useEffect(() => {
-    if (!startTime) return;
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const start = new Date(startTime).getTime();
-      const elapsed = now - start;
-      const remaining = 5000 - elapsed;
-
-      setTimeLeft(Math.max(remaining, 0));
-
-      if (remaining <= 0) {
-        clearInterval(interval);
-        setCurrentQuestionIndex((prev) => prev + 1);
-        setStartTime(new Date()); // reset for next question
-      }
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [startTime]);
-  */
 
   function timeStringToSeconds(str) {
     const [hh, mm, ss] = str.split(":").map(Number);
@@ -275,9 +236,10 @@ const GameLobby = () => {
     console.log("Selected answer:", selected);
     console.log("correct answer:", questions[currentQuestionIndex].correct);
 
-    // räcker detta?
     const correct = questions[currentQuestionIndex].correct;
-    let newStreak = selected === correct ? streak + 1 : 0;
+    // TODO: bring back the correct streak logic (the comment below)
+    // let newStreak = selected === correct ? streak + 1 : 0;
+    let newStreak = streak + 1;
     setStreak(newStreak);
 
     console.log("Selected answer:", selected);
@@ -297,11 +259,13 @@ const GameLobby = () => {
   if (loading) return <div>Laddar spel...</div>;
 
   if (gameState !== "active") {
+    setGame(gameId, userId);
     return (
       <LobbyView
         isHost={userId === hostId}
         onStart={handleStartGame}
         displayName={displayName}
+        players={players}
       />
     );
   }
@@ -312,6 +276,22 @@ const GameLobby = () => {
         answers={answers}
         questions={questions}
         navigateHome={() => navigate("/")}
+      />
+    );
+  }
+
+  if (open) {
+    const nicknames = Array.isArray(players)
+      ? players.map((p) => p.nickname)
+      : "";
+
+    return (
+      <Modal
+        open={open}
+        onClose={handleClose}
+        title="🔥 3 in a row!"
+        player_nicknames={nicknames}
+        onConfirm={handleClose}
       />
     );
   }

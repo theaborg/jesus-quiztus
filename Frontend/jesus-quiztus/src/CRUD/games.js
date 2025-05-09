@@ -57,8 +57,10 @@ export const getGameStartTime = async (gameId) => {
 export const getActivePlayers = async (gameId) => {
   const { data, error } = await supabase
     .from("users")
-    .select("id")
+    .select("nickname")
     .eq("game", gameId);
+
+  console.log("Active players data:", data);
 
   if (error) {
     console.error("Error in getActivePlayers:", error.message);

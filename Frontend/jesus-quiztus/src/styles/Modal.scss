@@ -1,0 +1,31 @@
+// TODO: make this stylesheet responsive
+@use "./colors" as *;
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5); // semi-transparent background
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-button {
+  padding: "0.5rem 1rem";
+  borderradius: "5px";
+  backgroundcolor: "#007bff";
+  color: "#fff";
+  border: "none";
+  cursor: "pointer";
+}
