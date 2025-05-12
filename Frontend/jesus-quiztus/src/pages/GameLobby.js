@@ -194,11 +194,24 @@ const GameLobby = () => {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
           console.log("current index: ", currentQuestionIndex);
+          /*
           if (currentQuestionIndex >= questions.length - 1) {
             console.log("Spelet är över!");
             setGameState("over");
             // behöver ändra state i databasen också
             // så att power ups kan tas bort och statistik kan lagras
+            if (hostId === userId) {
+              await setState(gameId, "over");
+            }
+          }
+            */
+          if (
+            currentQuestionIndex >= questions.length - 1 &&
+            gameState !== "over"
+          ) {
+            //console.log("Spelet är över!");
+            setGameState("over");
+
             if (hostId === userId) {
               await setState(gameId, "over");
             }

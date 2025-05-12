@@ -1,4 +1,3 @@
-import { data } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 export const fetchGameDetails = async (gameId) => {
@@ -32,12 +31,12 @@ export const getQuestionIndex = async (gameId) => {
 };
 
 export const setState = async (gameId, new_state) => {
-  console.log("Setting game  ", gameId, " to state ", new_state);
+  //console.log("Setting game  ", gameId, " to state ", new_state);
   const { error } = await supabase
     .from("games")
     .update({ state: new_state })
     .eq("id", gameId);
-  console.log("finished writing to db with game state");
+  //console.log("finished writing to db with game state");
   if (error) throw error;
 };
 
@@ -70,7 +69,7 @@ export const getActivePlayers = async (gameId) => {
     .select("nickname, id")
     .eq("game", gameId);
 
-  console.log("Active players data:", data);
+  //console.log("Active players data:", data);
 
   if (error) {
     console.error("Error in getActivePlayers:", error.message);

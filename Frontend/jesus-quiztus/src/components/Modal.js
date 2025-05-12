@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import "../styles/Modal.scss";
 import { sendPowerup } from "../CRUD/powerups";
@@ -35,8 +35,9 @@ const Modal = ({ open, onClose, title, players = [], onConfirm }) => {
   };
 
   const sendPowerUpToUser = async (receiver_id) => {
-    console.log("id ", receiver_id);
+    //console.log("id ", receiver_id);
     await sendPowerup(gameId, userId, receiver_id, "temp_powerup");
+    onClose();
   };
 
   //console.log("Modal open:", open);

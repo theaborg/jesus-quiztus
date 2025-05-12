@@ -24,7 +24,7 @@ export async function initGame(gameId, setId, access_token) {
         console.error("Fel från Edge Function:", text);
         return { error: text };
       } else {
-        console.log("Edge function kördes:", text);
+        //console.log("Edge function kördes:", text);
         return { error: null };
       }
     }
