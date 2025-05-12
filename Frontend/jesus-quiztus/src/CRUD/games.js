@@ -31,6 +31,16 @@ export const getQuestionIndex = async (gameId) => {
   if (error) throw error;
 };
 
+export const setState = async (gameId, new_state) => {
+  console.log("Setting game  ", gameId, " to state ", new_state);
+  const { error } = await supabase
+    .from("games")
+    .update({ state: new_state })
+    .eq("id", gameId);
+  console.log("finished writing to db with game state");
+  if (error) throw error;
+};
+
 export const setGameStartTime = async (gameId, time) => {
   const { error } = await supabase
     .from("games")
@@ -57,7 +67,7 @@ export const getGameStartTime = async (gameId) => {
 export const getActivePlayers = async (gameId) => {
   const { data, error } = await supabase
     .from("users")
-    .select("nickname")
+    .select("nickname, id")
     .eq("game", gameId);
 
   console.log("Active players data:", data);

@@ -2,7 +2,7 @@ import UpdateProfileForm from "../components/UpdateProfileForm";
 import { useUser } from "../context/UserContext";
 
 export default function Profile() {
-  const { session, displayName } = useUser("");
+  const { session } = useUser("");
 
   if (!session) {
     return (

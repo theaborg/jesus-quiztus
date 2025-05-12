@@ -11,19 +11,11 @@ import TimerBar from "../components/TimerBar";
 import { setGame } from "../CRUD/users";
 
 import { fetchGameDetails } from "../CRUD/games";
+import { setState } from "../CRUD/games";
 import { setGameStartTime } from "../CRUD/games";
 import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
 import { getGameStartTime } from "../CRUD/games";
 import { getActivePlayers } from "../CRUD/games";
-
-/**
- *
- * TODO:
- * - Highlighta svaren som är valda av spelaren.
- * - Se till att om spelaren inte väljer ett svar så defaultas ett felaktigt svar.
- * - spara DB osv..
- *
- */
 
 const GameLobby = () => {
   const { gameId } = useParams();
@@ -93,8 +85,9 @@ const GameLobby = () => {
   useEffect(() => {
     const fetchPlayers = async () => {
       let players = await getActivePlayers(gameId);
+      //console.log("Players data type(isch):", players);
       setPlayers(players);
-      console.log("Players in game:", players);
+      //console.log("Players in game:", players);
     };
 
     console.log("Streak useeffect:", streak);
@@ -138,13 +131,12 @@ const GameLobby = () => {
             setCurrentQuestionIndex(0);
 
             if (isHost) {
-              console.log("Host, starta spelet!");
+              //console.log("Host, starta spelet!");
               handleFirstQuestion();
             } else {
-              console.log("Inte host, vänta på start!");
+              //console.log("Inte host, vänta på start!");
             }
           }
-
           setGameState(newState);
           prevGameStateRef.current = newState;
         }
@@ -190,7 +182,7 @@ const GameLobby = () => {
       }
 
       // Begin countdown
-      interval = setInterval(() => {
+      interval = setInterval(async () => {
         const currTime = new Date().toTimeString().split(" ")[0];
         const elapsed =
           timeStringToSeconds(currTime) - timeStringToSeconds(start);
@@ -201,6 +193,16 @@ const GameLobby = () => {
         if (remaining <= 0) {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
+          console.log("current index: ", currentQuestionIndex);
+          if (currentQuestionIndex >= questions.length - 1) {
+            console.log("Spelet är över!");
+            setGameState("over");
+            // behöver ändra state i databasen också
+            // så att power ups kan tas bort och statistik kan lagras
+            if (hostId === userId) {
+              await setState(gameId, "over");
+            }
+          }
         }
       }, 100);
     };
@@ -214,7 +216,6 @@ const GameLobby = () => {
     const currTime = new Date();
     const formattedTime = currTime.toTimeString().split(" ")[0];
 
-    console.log("formattedTime", formattedTime);
     setStartTime(formattedTime);
     await setGameStartTime(gameId, formattedTime);
   };
@@ -233,8 +234,8 @@ const GameLobby = () => {
   };
 
   const handleAnswer = (selected) => {
-    console.log("Selected answer:", selected);
-    console.log("correct answer:", questions[currentQuestionIndex].correct);
+    //console.log("Selected answer:", selected);
+    //console.log("correct answer:", questions[currentQuestionIndex].correct);
 
     const correct = questions[currentQuestionIndex].correct;
     // TODO: bring back the correct streak logic (the comment below)
@@ -242,9 +243,9 @@ const GameLobby = () => {
     let newStreak = streak + 1;
     setStreak(newStreak);
 
-    console.log("Selected answer:", selected);
-    console.log("Correct answer:", correct);
-    console.log("New streak:", newStreak);
+    //console.log("Selected answer:", selected);
+    //console.log("Correct answer:", correct);
+    //console.log("New streak:", newStreak);
 
     setAnswers((prev) => [
       ...prev,
@@ -258,7 +259,17 @@ const GameLobby = () => {
 
   if (loading) return <div>Laddar spel...</div>;
 
-  if (gameState !== "active") {
+  //console.log("Game state:", gameState);
+  if (gameState === "over") {
+    //
+    return (
+      <ResultView
+        answers={answers}
+        questions={questions}
+        navigateHome={() => navigate("/")}
+      />
+    );
+  } else if (gameState !== "active") {
     setGame(gameId, userId);
     return (
       <LobbyView
@@ -270,27 +281,13 @@ const GameLobby = () => {
     );
   }
 
-  if (gameState === "over" || currentQuestionIndex >= questions.length) {
-    return (
-      <ResultView
-        answers={answers}
-        questions={questions}
-        navigateHome={() => navigate("/")}
-      />
-    );
-  }
-
   if (open) {
-    const nicknames = Array.isArray(players)
-      ? players.map((p) => p.nickname)
-      : "";
-
     return (
       <Modal
         open={open}
         onClose={handleClose}
         title="🔥 3 in a row!"
-        player_nicknames={nicknames}
+        players={players}
         onConfirm={handleClose}
       />
     );
