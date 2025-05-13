@@ -1,3 +1,4 @@
+import "../styles/QuestionsView.scss";
 const QuestionView = ({
   question,
   questionNumber,
@@ -29,29 +30,46 @@ const QuestionView = ({
       default:
         break;
     }
-    // if (latestPowerup.type == "Remove Words") {
-    //   modfiedQuestion = latestPowerup.effect(modfiedQuestion);
-    // }
   }
 
+  /*
   return (
-    <div className="p-4">
-      <h2 className="text-2xl mb-4">Fråga {questionNumber}</h2>
+    <div className="questions-view">
+      <h2 className="question-title">Fråga {questionNumber}</h2>
       <p
-        className="mb-6 text-lg"
+        className="question-text"
         dangerouslySetInnerHTML={{ __html: modfiedQuestion }}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {modfiedAlternatives.map((alt, index) => (
           <button
             key={index}
-            className={`px-4 py-2 border border-gray-300 rounded-lg 
-            hover:bg-gray-100
-            ${
-              selectedAlternative === alt ? "bg-green-200 border-green-400" : ""
-            }
-          `}
             onClick={() => onAnswer(alt)}
+          >
+            <span dangerouslySetInnerHTML={{ __html: alt }} />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+  */
+  return (
+    <div className="questions-view">
+      <div className="question-card">
+        {question.image && <img src={question.image} alt="Question visual" />}
+        <div className="category">{question.category || "Kategori"}</div>
+        <p
+          className="question-text"
+          dangerouslySetInnerHTML={{ __html: modfiedQuestion }}
+        />
+      </div>
+      <div className="alternatives-grid">
+        {modfiedAlternatives.map((alt, index) => (
+          <button
+            key={index}
+            className={selectedAlternative === alt ? "selected" : ""}
+            onClick={() => onAnswer(alt)}
+            disabled={selectedAlternative !== null} // disable after one selection
           >
             <span dangerouslySetInnerHTML={{ __html: alt }} />
           </button>

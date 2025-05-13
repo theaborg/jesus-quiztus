@@ -1,0 +1,93 @@
+@use "./colors" as *;
+
+.questions-view {
+  min-height: 100vh;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .question-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .category {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      color: #333;
+    }
+  }
+
+  .alternatives-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    max-width: 500px;
+    width: 100%;
+
+    button {
+      border: 2px solid transparent;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &.selected {
+        border-color: #333;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+        transform: scale(1.03);
+      }
+    }
+
+    // Individual button colors by order
+    button:nth-child(1) {
+      background-color: #ffe5e5; // light red
+      &:hover {
+        background-color: #ffcccc;
+      }
+    }
+
+    button:nth-child(2) {
+      background-color: #e5ffe5; // light green
+      &:hover {
+        background-color: #ccffcc;
+      }
+    }
+
+    button:nth-child(3) {
+      background-color: #e5f0ff; // light blue
+      &:hover {
+        background-color: #cce0ff;
+      }
+    }
+
+    button:nth-child(4) {
+      background-color: #f9f9f9; // near white
+      &:hover {
+        background-color: #eeeeee;
+      }
+    }
+  }
+}

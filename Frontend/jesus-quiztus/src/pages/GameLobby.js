@@ -40,6 +40,8 @@ const GameLobby = () => {
   const [streak, setStreak] = useState(0);
   const [players, setPlayers] = useState([]);
   const [activePowerup, setActivePowerup] = useState();
+  const [selectedAlternative, setSelectedAlternative] = useState(null);
+
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -228,7 +230,8 @@ const GameLobby = () => {
         if (remaining <= 0) {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
-          console.log("current index: ", currentQuestionIndex);
+          setSelectedAlternative(null); // <-- reset selection
+          //console.log("current index: ", currentQuestionIndex);
 
           // behöver ändra state i databasen också
           // så att power ups kan tas bort och statistik kan lagras
@@ -272,6 +275,7 @@ const GameLobby = () => {
     await initGame(gameId, questionSetId, session.access_token);
   };
 
+  /*
   const handleAnswer = (selected) => {
     //console.log("Selected answer:", selected);
     //console.log("correct answer:", questions[currentQuestionIndex].correct);
@@ -295,6 +299,27 @@ const GameLobby = () => {
       },
     ]);
   };
+  */
+
+  const handleAnswer = (selected) => {
+  if (selectedAlternative !== null) return; // already answered
+
+  setSelectedAlternative(selected);
+
+  const correct = questions[currentQuestionIndex].correct;
+  let newStreak = streak + 1;
+  setStreak(newStreak);
+
+  setAnswers((prev) => [
+    ...prev,
+    {
+      questionIndex: currentQuestionIndex,
+      selected,
+      correct,
+    },
+  ]);
+};
+
 
   if (loading) return <div>Laddar spel...</div>;
 
@@ -337,6 +362,7 @@ const GameLobby = () => {
         question={questions[currentQuestionIndex]}
         questionNumber={currentQuestionIndex + 1}
         onAnswer={handleAnswer}
+        selectedAlternative={selectedAlternative}
         receivedPowerUps={receivedPowerUps}
       />
       <TimerBar timeLeft={timeLeft} />
