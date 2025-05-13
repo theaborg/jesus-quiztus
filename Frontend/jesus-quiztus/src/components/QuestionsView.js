@@ -32,32 +32,18 @@ const QuestionView = ({
     }
   }
 
-  /*
-  return (
-    <div className="questions-view">
-      <h2 className="question-title">Fråga {questionNumber}</h2>
-      <p
-        className="question-text"
-        dangerouslySetInnerHTML={{ __html: modfiedQuestion }}
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {modfiedAlternatives.map((alt, index) => (
-          <button
-            key={index}
-            onClick={() => onAnswer(alt)}
-          >
-            <span dangerouslySetInnerHTML={{ __html: alt }} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-  */
   return (
     <div className="questions-view">
       <div className="question-card">
         {question.image && <img src={question.image} alt="Question visual" />}
-        <div className="category">{question.category || "Kategori"}</div>
+        <div className="category">
+          <span
+            dangerouslySetInnerHTML={{
+              __html: question.category || "Kategori",
+            }}
+          />
+        </div>
+
         <p
           className="question-text"
           dangerouslySetInnerHTML={{ __html: modfiedQuestion }}

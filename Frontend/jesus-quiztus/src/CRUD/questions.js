@@ -13,6 +13,8 @@ export const fetchQuestions = async (questionSetId) => {
     text: q.question,
     alternatives: shuffle([q.answer, q.alt_1, q.alt_2, q.alt_3]),
     correct: q.answer,
+    category: q.category,
+    image: q.image,
   }));
 };
 

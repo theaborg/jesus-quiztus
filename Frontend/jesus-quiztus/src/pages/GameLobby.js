@@ -9,6 +9,7 @@ import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
 import TimerBar from "../components/TimerBar";
 import { setGame } from "../CRUD/users";
+import { getPlayersWithAvatars } from "../CRUD/users";
 
 import { fetchGameDetails } from "../CRUD/games";
 import { setState } from "../CRUD/games";
@@ -41,7 +42,7 @@ const GameLobby = () => {
   const [players, setPlayers] = useState([]);
   const [activePowerup, setActivePowerup] = useState();
   const [selectedAlternative, setSelectedAlternative] = useState(null);
-
+  
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -82,8 +83,38 @@ const GameLobby = () => {
     if (gameState !== "pending") return;
 
     const interval = setInterval(async () => {
+      //const activePlayers = await getActivePlayers(gameId);
+      //setPlayers(activePlayers || []);
+
       const activePlayers = await getActivePlayers(gameId);
-      setPlayers(activePlayers || []);
+
+      // For each player, fetch their profile image
+      const playersWithAvatars = await Promise.all(
+        (activePlayers || []).map(async (p) => {
+          return getPlayersWithAvatars(p);
+
+          /*
+          const { data, error } = await supabase
+            .from("users")
+            .select("profile_picture")
+            .eq("id", p.id) // assumes `p.id` is the Supabase user ID
+            .single();
+
+          let avatarUrl = "/profile_picture.jpg"; // fallback
+
+          if (data?.profile_picture) {
+            const { data: urlData } = supabase.storage
+              .from("profile-pictures")
+              .getPublicUrl(`${p.id}/${data.profile_picture}`);
+            avatarUrl = urlData?.publicUrl || avatarUrl;
+          }
+
+          return { ...p, avatarUrl };
+          */
+        })
+      );
+
+      setPlayers(playersWithAvatars);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -171,9 +202,7 @@ const GameLobby = () => {
         (payload) => {
           console.log("New powerup received:", payload.new);
           //alert(`You've received a powerup: ${payload.new.type}`);
-          let thing = powerups.find(
-            (powa) => powa.type === payload.new.type
-          );
+          let thing = powerups.find((powa) => powa.type === payload.new.type);
           //console.log("Powerup found:", thing);
           setreceivedPowerUps((prevStateArray) => [...prevStateArray, thing]);
         }
@@ -302,24 +331,23 @@ const GameLobby = () => {
   */
 
   const handleAnswer = (selected) => {
-  if (selectedAlternative !== null) return; // already answered
+    if (selectedAlternative !== null) return; // already answered
 
-  setSelectedAlternative(selected);
+    setSelectedAlternative(selected);
 
-  const correct = questions[currentQuestionIndex].correct;
-  let newStreak = streak + 1;
-  setStreak(newStreak);
+    const correct = questions[currentQuestionIndex].correct;
+    let newStreak = streak + 1;
+    setStreak(newStreak);
 
-  setAnswers((prev) => [
-    ...prev,
-    {
-      questionIndex: currentQuestionIndex,
-      selected,
-      correct,
-    },
-  ]);
-};
-
+    setAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestionIndex,
+        selected,
+        correct,
+      },
+    ]);
+  };
 
   if (loading) return <div>Laddar spel...</div>;
 
