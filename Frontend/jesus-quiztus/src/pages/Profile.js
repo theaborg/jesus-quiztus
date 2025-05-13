@@ -11,8 +11,6 @@ export default function Profile() {
       </div>
     );
   }
-  // TODO: ta bort <br> efter image när vi lägger till css
-  // TODO: to bort style på bilden när vi lägger till css
 
   return (
     <div>

@@ -17,6 +17,9 @@ import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
 import { getGameStartTime } from "../CRUD/games";
 import { getActivePlayers } from "../CRUD/games";
 
+import { getRandomPowerup } from "../components/Powerup";
+import powerups from "../components/Powerup";
+
 const GameLobby = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
@@ -30,11 +33,13 @@ const GameLobby = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [receivedPowerUps, setreceivedPowerUps] = useState([]);
   const [open, setOpen] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(5000);
   const [streak, setStreak] = useState(0);
   const [players, setPlayers] = useState([]);
+  const [activePowerup, setActivePowerup] = useState();
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -85,20 +90,21 @@ const GameLobby = () => {
   useEffect(() => {
     const fetchPlayers = async () => {
       let players = await getActivePlayers(gameId);
-      //console.log("Players data type(isch):", players);
       setPlayers(players);
-      //console.log("Players in game:", players);
     };
 
     console.log("Streak useeffect:", streak);
     if (streak >= 3) {
       fetchPlayers();
+      var activePowerup = getRandomPowerup();
+      setActivePowerup(activePowerup);
       handleOpen();
       // Do something here: trigger bonus, sound, UI effect, etc.
     }
   }, [streak]);
 
   const handleClose = () => {
+    setStreak(0);
     setOpen(false);
   };
 
@@ -131,10 +137,8 @@ const GameLobby = () => {
             setCurrentQuestionIndex(0);
 
             if (isHost) {
-              //console.log("Host, starta spelet!");
               handleFirstQuestion();
             } else {
-              //console.log("Inte host, vänta på start!");
             }
           }
           setGameState(newState);
@@ -147,6 +151,37 @@ const GameLobby = () => {
       supabase.removeChannel(channel);
     };
   }, [gameId, userId]);
+
+  // Temp listener for powerups
+  useEffect(() => {
+    if (!userId || !gameId) return;
+
+    const channel = supabase
+      .channel("powerups_channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "Powerups",
+          filter: `receiver_id=eq.${userId}`, // only receive powerups for this player
+        },
+        (payload) => {
+          console.log("New powerup received:", payload.new);
+          //alert(`You've received a powerup: ${payload.new.type}`);
+          let thing = powerups.find(
+            (powa) => powa.type === payload.new.type
+          );
+          //console.log("Powerup found:", thing);
+          setreceivedPowerUps((prevStateArray) => [...prevStateArray, thing]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId, gameId]);
 
   function timeStringToSeconds(str) {
     const [hh, mm, ss] = str.split(":").map(Number);
@@ -194,22 +229,13 @@ const GameLobby = () => {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
           console.log("current index: ", currentQuestionIndex);
-          /*
-          if (currentQuestionIndex >= questions.length - 1) {
-            console.log("Spelet är över!");
-            setGameState("over");
-            // behöver ändra state i databasen också
-            // så att power ups kan tas bort och statistik kan lagras
-            if (hostId === userId) {
-              await setState(gameId, "over");
-            }
-          }
-            */
+
+          // behöver ändra state i databasen också
+          // så att power ups kan tas bort och statistik kan lagras
           if (
             currentQuestionIndex >= questions.length - 1 &&
             gameState !== "over"
           ) {
-            //console.log("Spelet är över!");
             setGameState("over");
 
             if (hostId === userId) {
@@ -272,9 +298,7 @@ const GameLobby = () => {
 
   if (loading) return <div>Laddar spel...</div>;
 
-  //console.log("Game state:", gameState);
   if (gameState === "over") {
-    //
     return (
       <ResultView
         answers={answers}
@@ -299,9 +323,10 @@ const GameLobby = () => {
       <Modal
         open={open}
         onClose={handleClose}
-        title="🔥 3 in a row!"
+        title={`🔥 3 in a row! Powerup: ${activePowerup.type}`}
         players={players}
         onConfirm={handleClose}
+        activePowerUp={activePowerup}
       />
     );
   }
@@ -312,6 +337,7 @@ const GameLobby = () => {
         question={questions[currentQuestionIndex]}
         questionNumber={currentQuestionIndex + 1}
         onAnswer={handleAnswer}
+        receivedPowerUps={receivedPowerUps}
       />
       <TimerBar timeLeft={timeLeft} />
     </div>

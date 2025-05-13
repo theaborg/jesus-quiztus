@@ -3,39 +3,36 @@
  */
 
 const powerups = [
-    {
-      name: "Eliminate Two",
-      type: "helpful",
-      description: "Eliminate two incorrect answers.",
-      effect: (question) => {
-        // Logic to mark two incorrect answers
-        // You can implement this later as needed
-      },
+  {
+    type: "Eliminate Two",
+    description: "Eliminate two incorrect answers.",
+    effect: (question) => {
+      console.log("Eliminating two incorrect answers");
+      // Logic to mark two incorrect answers
+      // You can implement this later as needed
     },
-    {
-      name: "Remove Words",
-      type: "harmful",
-      description:
-        "Every other word in the question is removed.",
-      effect: (question) => {
-        const words = question.split(" ");
-        return words.filter((_, i) => i % 2 === 0).join(" ");
-      },
+  },
+  {
+    type: "Remove Words",
+    description: "Every other word in the question is removed.",
+    effect: (question) => {
+      const words = question.split(" ");
+      const replaced = words.map((word, i) => (i % 2 === 1 ? "____" : word));
+      return replaced.join(" ");
     },
-    {
-      name: "Shuffle Answers",
-      type: "harmful",
-      description:
-        "Shuffling / mixing answers every second (or so).",
-      effect: (answers) => {
-        return answers.sort(() => Math.random() - 0.5);
-      },
+  },
+  {
+    type: "Shuffle Answers",
+    description: "Shuffling / mixing answers every second (or so).",
+    effect: (answers) => {
+      return answers.sort(() => Math.random() - 0.5);
     },
-  ];
+  },
+];
 
-  export const getRandomPowerup = () => {
-    const index = Math.floor(Math.random() * powerups.length);
-    return powerups[index];
-  };
-  
-  export default powerups;
+export const getRandomPowerup = () => {
+  const index = Math.floor(Math.random() * powerups.length);
+  return powerups[index];
+};
+
+export default powerups;

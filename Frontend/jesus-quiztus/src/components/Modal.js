@@ -11,7 +11,14 @@ import { sendPowerup } from "../CRUD/powerups";
  *
  */
 
-const Modal = ({ open, onClose, title, players = [], onConfirm }) => {
+const Modal = ({
+  open,
+  onClose,
+  title,
+  players = [],
+  onConfirm,
+  activePowerUp,
+}) => {
   const { gameId } = useParams();
   const { userId } = useUser();
 
@@ -35,12 +42,9 @@ const Modal = ({ open, onClose, title, players = [], onConfirm }) => {
   };
 
   const sendPowerUpToUser = async (receiver_id) => {
-    //console.log("id ", receiver_id);
-    await sendPowerup(gameId, userId, receiver_id, "temp_powerup");
+    await sendPowerup(gameId, userId, receiver_id, activePowerUp.type);
     onClose();
   };
-
-  //console.log("Modal open:", open);
 
   return (
     <div onClick={handleBackdropClick} className="modal-backdrop">
