@@ -9,6 +9,7 @@ import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
 import TimerBar from "../components/TimerBar";
 import { setGame } from "../CRUD/users";
+import { getPlayersWithAvatars } from "../CRUD/users";
 
 import { fetchGameDetails } from "../CRUD/games";
 import { setState } from "../CRUD/games";
@@ -40,6 +41,8 @@ const GameLobby = () => {
   const [streak, setStreak] = useState(0);
   const [players, setPlayers] = useState([]);
   const [activePowerup, setActivePowerup] = useState();
+  const [selectedAlternative, setSelectedAlternative] = useState(null);
+  
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -80,8 +83,38 @@ const GameLobby = () => {
     if (gameState !== "pending") return;
 
     const interval = setInterval(async () => {
+      //const activePlayers = await getActivePlayers(gameId);
+      //setPlayers(activePlayers || []);
+
       const activePlayers = await getActivePlayers(gameId);
-      setPlayers(activePlayers || []);
+
+      // For each player, fetch their profile image
+      const playersWithAvatars = await Promise.all(
+        (activePlayers || []).map(async (p) => {
+          return getPlayersWithAvatars(p);
+
+          /*
+          const { data, error } = await supabase
+            .from("users")
+            .select("profile_picture")
+            .eq("id", p.id) // assumes `p.id` is the Supabase user ID
+            .single();
+
+          let avatarUrl = "/profile_picture.jpg"; // fallback
+
+          if (data?.profile_picture) {
+            const { data: urlData } = supabase.storage
+              .from("profile-pictures")
+              .getPublicUrl(`${p.id}/${data.profile_picture}`);
+            avatarUrl = urlData?.publicUrl || avatarUrl;
+          }
+
+          return { ...p, avatarUrl };
+          */
+        })
+      );
+
+      setPlayers(playersWithAvatars);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -169,9 +202,7 @@ const GameLobby = () => {
         (payload) => {
           console.log("New powerup received:", payload.new);
           //alert(`You've received a powerup: ${payload.new.type}`);
-          let thing = powerups.find(
-            (powa) => powa.type === payload.new.type
-          );
+          let thing = powerups.find((powa) => powa.type === payload.new.type);
           //console.log("Powerup found:", thing);
           setreceivedPowerUps((prevStateArray) => [...prevStateArray, thing]);
         }
@@ -228,7 +259,8 @@ const GameLobby = () => {
         if (remaining <= 0) {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
-          console.log("current index: ", currentQuestionIndex);
+          setSelectedAlternative(null); // <-- reset selection
+          //console.log("current index: ", currentQuestionIndex);
 
           // behöver ändra state i databasen också
           // så att power ups kan tas bort och statistik kan lagras
@@ -272,6 +304,7 @@ const GameLobby = () => {
     await initGame(gameId, questionSetId, session.access_token);
   };
 
+  /*
   const handleAnswer = (selected) => {
     //console.log("Selected answer:", selected);
     //console.log("correct answer:", questions[currentQuestionIndex].correct);
@@ -295,6 +328,29 @@ const GameLobby = () => {
       },
     ]);
   };
+  */
+
+  const handleAnswer = (selected) => {
+    // kanske lite brute men det funkar atm :) 
+    if (selectedAlternative !== null) {
+      return;
+     }
+
+    setSelectedAlternative(selected);
+
+    const correct = questions[currentQuestionIndex].correct;
+    let newStreak = streak + 1;
+    setStreak(newStreak);
+
+    setAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestionIndex,
+        selected,
+        correct,
+      },
+    ]);
+  };
 
   if (loading) return <div>Laddar spel...</div>;
 
@@ -307,7 +363,10 @@ const GameLobby = () => {
       />
     );
   } else if (gameState !== "active") {
-    setGame(gameId, userId);
+    if (userId != null) {
+      setGame(gameId, userId);
+    }
+    //setGame(gameId, userId);
     return (
       <LobbyView
         isHost={userId === hostId}
@@ -337,6 +396,7 @@ const GameLobby = () => {
         question={questions[currentQuestionIndex]}
         questionNumber={currentQuestionIndex + 1}
         onAnswer={handleAnswer}
+        selectedAlternative={selectedAlternative}
         receivedPowerUps={receivedPowerUps}
       />
       <TimerBar timeLeft={timeLeft} />
