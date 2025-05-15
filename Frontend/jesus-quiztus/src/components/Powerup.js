@@ -6,10 +6,18 @@ const powerups = [
   {
     type: "Eliminate Two",
     description: "Eliminate two incorrect answers.",
-    effect: (question) => {
-      console.log("Eliminating two incorrect answers");
-      // Logic to mark two incorrect answers
-      // You can implement this later as needed
+    effect: (alternatives, question) => {
+      console.log("his is the correct answer: ", question.correct);
+      const incorrectAlternatives = alternatives.filter(
+        (alternative) => alternative != question.correct
+      );
+      console.log("incorrect alts: ", incorrectAlternatives);
+      const newAnswers = [
+        incorrectAlternatives[1],
+        question.correct,
+      ];
+      console.log("New alternatives: ", newAnswers);
+      return newAnswers;
     },
   },
   {

@@ -12,6 +12,7 @@ const QuestionView = ({
   let modfiedQuestion = question.text;
   let modfiedAlternatives = question.alternatives;
   let latestPowerup = null;
+  //console.log("Correct answer", question.correct);
 
   if (receivedPowerUps && receivedPowerUps.length !== 0) {
     latestPowerup = receivedPowerUps[receivedPowerUps.length - 1];
@@ -22,7 +23,7 @@ const QuestionView = ({
         modfiedQuestion = latestPowerup.effect(modfiedQuestion);
         break;
       case "Eliminate Two":
-        latestPowerup.effect(modfiedAlternatives);
+        modfiedAlternatives = latestPowerup.effect(modfiedAlternatives, question);
         break;
       case "Shuffle Answers":
         modfiedAlternatives = latestPowerup.effect(modfiedAlternatives);

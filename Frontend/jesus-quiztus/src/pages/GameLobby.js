@@ -42,7 +42,6 @@ const GameLobby = () => {
   const [players, setPlayers] = useState([]);
   const [activePowerup, setActivePowerup] = useState();
   const [selectedAlternative, setSelectedAlternative] = useState(null);
-  
 
   useEffect(() => {
     if (!gameId || gameId === "undefined") {
@@ -201,10 +200,8 @@ const GameLobby = () => {
         },
         (payload) => {
           console.log("New powerup received:", payload.new);
-          //alert(`You've received a powerup: ${payload.new.type}`);
-          let thing = powerups.find((powa) => powa.type === payload.new.type);
-          //console.log("Powerup found:", thing);
-          setreceivedPowerUps((prevStateArray) => [...prevStateArray, thing]);
+          let newPowerUp = powerups.find((pow) => pow.type === payload.new.type);
+          setreceivedPowerUps((prevStateArray) => [...prevStateArray, newPowerUp]);
         }
       )
       .subscribe();
@@ -260,8 +257,6 @@ const GameLobby = () => {
           clearInterval(interval);
           setCurrentQuestionIndex((prev) => prev + 1);
           setSelectedAlternative(null); // <-- reset selection
-          //console.log("current index: ", currentQuestionIndex);
-
           // behöver ändra state i databasen också
           // så att power ups kan tas bort och statistik kan lagras
           if (
@@ -304,37 +299,11 @@ const GameLobby = () => {
     await initGame(gameId, questionSetId, session.access_token);
   };
 
-  /*
   const handleAnswer = (selected) => {
-    //console.log("Selected answer:", selected);
-    //console.log("correct answer:", questions[currentQuestionIndex].correct);
-
-    const correct = questions[currentQuestionIndex].correct;
-    // TODO: bring back the correct streak logic (the comment below)
-    // let newStreak = selected === correct ? streak + 1 : 0;
-    let newStreak = streak + 1;
-    setStreak(newStreak);
-
-    //console.log("Selected answer:", selected);
-    //console.log("Correct answer:", correct);
-    //console.log("New streak:", newStreak);
-
-    setAnswers((prev) => [
-      ...prev,
-      {
-        questionIndex: currentQuestionIndex,
-        selected,
-        correct: questions[currentQuestionIndex].correct,
-      },
-    ]);
-  };
-  */
-
-  const handleAnswer = (selected) => {
-    // kanske lite brute men det funkar atm :) 
+    // kanske lite brute men det funkar atm :)
     if (selectedAlternative !== null) {
       return;
-     }
+    }
 
     setSelectedAlternative(selected);
 

@@ -59,7 +59,6 @@ const UserSearch = ({ currentUserId }) => {
 
   return (
     <div className="user-search-container">
-      <p>Friends will go here</p>
       <label className="second-header-text">Search Users</label>
 
       <input
