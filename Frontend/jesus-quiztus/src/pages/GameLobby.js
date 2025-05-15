@@ -331,7 +331,10 @@ const GameLobby = () => {
   */
 
   const handleAnswer = (selected) => {
-    if (selectedAlternative !== null) return; // already answered
+    // kanske lite brute men det funkar atm :) 
+    if (selectedAlternative !== null) {
+      return;
+     }
 
     setSelectedAlternative(selected);
 
@@ -360,7 +363,10 @@ const GameLobby = () => {
       />
     );
   } else if (gameState !== "active") {
-    setGame(gameId, userId);
+    if (userId != null) {
+      setGame(gameId, userId);
+    }
+    //setGame(gameId, userId);
     return (
       <LobbyView
         isHost={userId === hostId}

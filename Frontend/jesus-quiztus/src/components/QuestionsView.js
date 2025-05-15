@@ -55,7 +55,8 @@ const QuestionView = ({
             key={index}
             className={selectedAlternative === alt ? "selected" : ""}
             onClick={() => onAnswer(alt)}
-            disabled={selectedAlternative !== null} // disable after one selection
+            // Stänger av knapparna om ett alt har
+            disabled={selectedAlternative !== null}
           >
             <span dangerouslySetInnerHTML={{ __html: alt }} />
           </button>
