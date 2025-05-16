@@ -31,8 +31,6 @@ const Modal = ({
       }, {})
     : {};
 
-  //console.log("print från modalen, nicknames: ", player_nicknames);
-
   const handleBackdropClick = () => {
     onClose();
   };

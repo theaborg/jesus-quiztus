@@ -6,6 +6,8 @@ import Game from "./pages/Game";
 import Profile from "./pages/Profile";
 import Friends from "./pages/Friends";
 import GameLobby from "./pages/GameLobby";
+import CustomQuestions from "./pages/CustomQuestions";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider, useUser } from "./context/UserContext";
 import "./styles/App.scss";
@@ -57,6 +59,7 @@ export default function App() {
             <Route path="/friends" element={<Friends />} />
             <Route path="/lobby/:gameId" element={<GameLobby />} />
             <Route path="/lobby" element={<GameLobby />} />
+            <Route path="/custom-questions" element={<CustomQuestions />} />
           </Routes>
         </UserProvider>
       </div>

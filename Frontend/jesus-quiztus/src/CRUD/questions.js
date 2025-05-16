@@ -19,3 +19,51 @@ export const fetchQuestions = async (questionSetId) => {
 };
 
 const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+
+export const getQuestionSets = async (userId) => {
+  console.log("userId in getQuestionSets: ", userId);
+  const { data, error } = await supabase
+    .from("QuestionsSet")
+    .select("*")
+    .eq("user", userId);
+
+  if (error) throw error;
+
+  console.log("data in getQuestionSets: ", data);
+  return data; //.map((set) => ({id: set.id,name: set.name,description: set.description,}));
+};
+
+export const createSet = async (name, category, amount, userId) => {
+  const { error } = await supabase.from("QuestionsSet").insert({
+    name: name || "Name",
+    description: category || "Category",
+    user: userId,
+    amount: amount,
+  });
+
+  if (error) throw error;
+};
+
+export const createQuestion = async (
+  question,
+  answer,
+  alt1,
+  alt2,
+  alt3,
+  category,
+  image,
+  set
+) => {
+  const { error } = await supabase.from("Questions").insert({
+    question: question || "Question",
+    answer: answer || "Answer",
+    alt_1: alt1 || "Alternative 1",
+    alt_2: alt2 || "Alternative 2",
+    alt_3: alt3 || "Alternative 3",
+    category: category || "Category",
+    image: image || null,
+    set: set,
+  });
+
+  if (error) throw error;
+};

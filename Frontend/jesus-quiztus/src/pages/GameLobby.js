@@ -91,25 +91,6 @@ const GameLobby = () => {
       const playersWithAvatars = await Promise.all(
         (activePlayers || []).map(async (p) => {
           return getPlayersWithAvatars(p);
-
-          /*
-          const { data, error } = await supabase
-            .from("users")
-            .select("profile_picture")
-            .eq("id", p.id) // assumes `p.id` is the Supabase user ID
-            .single();
-
-          let avatarUrl = "/profile_picture.jpg"; // fallback
-
-          if (data?.profile_picture) {
-            const { data: urlData } = supabase.storage
-              .from("profile-pictures")
-              .getPublicUrl(`${p.id}/${data.profile_picture}`);
-            avatarUrl = urlData?.publicUrl || avatarUrl;
-          }
-
-          return { ...p, avatarUrl };
-          */
         })
       );
 
@@ -125,7 +106,6 @@ const GameLobby = () => {
       setPlayers(players);
     };
 
-    console.log("Streak useeffect:", streak);
     if (streak >= 3) {
       fetchPlayers();
       var activePowerup = getRandomPowerup();
@@ -200,8 +180,13 @@ const GameLobby = () => {
         },
         (payload) => {
           console.log("New powerup received:", payload.new);
-          let newPowerUp = powerups.find((pow) => pow.type === payload.new.type);
-          setreceivedPowerUps((prevStateArray) => [...prevStateArray, newPowerUp]);
+          let newPowerUp = powerups.find(
+            (pow) => pow.type === payload.new.type
+          );
+          setreceivedPowerUps((prevStateArray) => [
+            ...prevStateArray,
+            newPowerUp,
+          ]);
         }
       )
       .subscribe();
@@ -308,7 +293,7 @@ const GameLobby = () => {
     setSelectedAlternative(selected);
 
     const correct = questions[currentQuestionIndex].correct;
-    let newStreak = streak + 1;
+    let newStreak = selected === correct ? streak + 1 : 0;
     setStreak(newStreak);
 
     setAnswers((prev) => [

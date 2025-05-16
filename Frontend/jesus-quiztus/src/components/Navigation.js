@@ -14,6 +14,12 @@ export default function Navigation() {
         Join Game
       </button> */}
       {/* <button onClick={() => pass}>Invitations</button> */}
+      <button
+        className="nav-button"
+        onClick={async () => navigate("/custom-questions")}
+      >
+        Create custom questions
+      </button>
       <button className="nav-button" onClick={() => navigate("/profile")}>
         Profile
       </button>
