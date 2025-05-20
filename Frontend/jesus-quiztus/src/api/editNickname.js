@@ -1,5 +1,4 @@
 export async function editNickname(nickname, user_id, access_token) {
-  //console.log('Adding friend:', friendId, userId, access_token);
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/update_nickname",
     {

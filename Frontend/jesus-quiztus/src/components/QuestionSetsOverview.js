@@ -7,7 +7,8 @@ import "../styles/QuestionSetsOverview.scss";
 
 export default function QuestionSetsOverview() {
   const { userId } = useUser();
-
+  const [editMode, setEditMode] = useState(false);
+  const [editableQuestionSet, setEditableQuestionSet] = useState(null);
   const [questionSets, setQuestionSets] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [numQuestions, setNumQuestions] = useState(0);
@@ -31,9 +32,12 @@ export default function QuestionSetsOverview() {
         open={showModal}
         onClose={() => setShowModal(false)}
         //numberQuestions={0}
+        edit={editMode}
+        editableQuestionSet={editableQuestionSet}
         onSubmit={(questions) => {
           console.log("Submitted questions:", questions);
           setShowModal(false);
+          setEditMode(false);
         }}
       />
     );
@@ -49,10 +53,10 @@ export default function QuestionSetsOverview() {
             <p>Questions: {set.amount}</p>
             <button
               className="edit-set-button"
-              // TODO: pass existing questions to modal
-              // so they can be shown instead of filled in
               onClick={() => {
-                console.log("Create new question set");
+                console.log("Edit existing question set.");
+                setEditMode(true);
+                setEditableQuestionSet(set.id);
                 setShowModal(true);
               }}
             >

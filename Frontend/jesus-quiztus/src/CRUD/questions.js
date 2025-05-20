@@ -4,8 +4,7 @@ export const fetchQuestions = async (questionSetId) => {
   const { data, error } = await supabase
     .from("Questions")
     .select("*")
-    .eq("set", questionSetId)
-    .order("id", { ascending: true });
+    .eq("set", questionSetId);
 
   if (error) throw error;
 
@@ -38,12 +37,12 @@ export const createSet = async (name, category, amount, userId) => {
     .from("QuestionsSet")
     .insert({
       name: name || "Name",
-      description: category || "Category",
+      category: category || "Category",
       user: userId,
       amount: amount,
     })
-    .select("id")  // tror att detta hämtar tillbaka id:t
-    .single();  
+    .select("id") // tror att detta hämtar tillbaka id:t
+    .single();
 
   if (error) throw error;
   return data.id;
@@ -66,9 +65,33 @@ export const createQuestion = async (
     alt_2: alt2 || "Alternative 2",
     alt_3: alt3 || "Alternative 3",
     category: category || "Category",
-    image: image || null,
+    //image: image || null,
     set: set,
   });
+
+  if (error) throw error;
+};
+
+export const updateQuestion = async (
+  id,
+  question,
+  answer,
+  alt1,
+  alt2,
+  alt3,
+  category
+) => {
+  const { error } = await supabase
+    .from("Questions")
+    .update({
+      question,
+      answer,
+      alt_1: alt1,
+      alt_2: alt2,
+      alt_3: alt3,
+      category,
+    })
+    .eq("id", id);
 
   if (error) throw error;
 };

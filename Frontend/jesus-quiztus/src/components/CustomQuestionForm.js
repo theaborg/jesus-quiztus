@@ -1,125 +1,194 @@
-import React, { useState } from "react";
-import { createSet, createQuestion } from "../CRUD/questions";
+import React, { useState, useEffect } from "react";
+import { createSet, createQuestion, fetchQuestions, updateQuestion } from "../CRUD/questions";
+import { useUser } from "../context/UserContext";
 
-const CustomQuestionForm = ({ open, onClose, onSubmit }) => {
-  const [questions, setQuestions] = useState([]);
+const CustomQuestionForm = ({
+  open,
+  onClose,
+  onSubmit,
+  edit,
+  editableQuestionSet,
+}) => {
+  const { userId } = useUser();
+
+  const [questions, setQuestions] = useState([
+    { question: "", options: ["", "", "", ""], correctIndex: 0 },
+  ]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", "", "", ""]);
-  const [correctIndex, setCorrectIndex] = useState(0);
   const [done, setDone] = useState(false);
   const [questionSetName, setQuestionSetName] = useState("");
   const [category, setCategory] = useState("");
 
+  // Load existing questions if editing
+  useEffect(() => {
+    const getExistingQuestions = async (questionSetId) => {
+      const existing = await fetchQuestions(questionSetId);
+      const formatted = existing.map((q) => {
+        const correctIndex = [
+          q.alternatives[0],
+          q.alternatives[1],
+          q.alternatives[2],
+          q.alternatives[3],
+        ].indexOf(q.correct);
+        return {
+          question: q.text,
+          options: q.alternatives,
+          correctIndex: correctIndex >= 0 ? correctIndex : 0,
+        };
+      });
+      setQuestions(
+        formatted.length > 0
+          ? formatted
+          : [{ question: "", options: ["", "", "", ""], correctIndex: 0 }]
+      );
+    };
 
-  const createQuestionSet = async (name, category, questions, userId) => {
-    try {
-      const setId = await createSet(name, category, questions.length, userId);
-      for (const question of questions) {
-        await createQuestion(
-          question.question,
-          question.options[question.correctIndex],
-          question.options[0],
-          question.options[1],
-          question.options[2],
-          category,
-          null,
-          setId
-        );
-      }
+    if (edit && editableQuestionSet) {
+      getExistingQuestions(editableQuestionSet);
     }
-    catch (error) {
-      console.error("Error creating question set:", error);   
-      alert("Error creating question set. Please try again.");
-    }
+  }, [edit, editableQuestionSet]);
 
+  const updateCurrQuestion = (field, value) => {
+    const updated = [...questions];
+    updated[currentQuestionIndex][field] = value;
+    setQuestions(updated);
   };
 
+  const updateCurrOption = (index, value) => {
+    const updated = [...questions];
+    updated[currentQuestionIndex].options[index] = value;
+    setQuestions(updated);
+  };
 
   const handleNext = () => {
-    if (!question.trim() || options.some((opt) => !opt.trim())) {
-      alert("Please fill in the question and all options.");
+    const current = questions[currentQuestionIndex];
+    if (!current.question.trim()) {
+      alert("Please enter a question.");
+      return;
+    }
+    if (current.options.filter((opt) => opt.trim()).length < 2) {
+      alert("Please provide at least two answer options.");
       return;
     }
 
-    const newQuestion = {
-      question,
-      options,
-      correctIndex,
-    };
+    // Add new blank question if at end
+    if (currentQuestionIndex === questions.length - 1) {
+      setQuestions([
+        ...questions,
+        { question: "", options: ["", "", "", ""], correctIndex: 0 },
+      ]);
+    }
 
-    setQuestions([...questions, newQuestion]);
-    setQuestion("");
-    setOptions(["", "", "", ""]);
-    setCorrectIndex(0);
     setCurrentQuestionIndex((prev) => prev + 1);
   };
 
+  const handlePrev = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  };
+
   const handleMarkDone = () => {
-    if (!question.trim() || options.some((opt) => !opt.trim())) {
-      alert("Please complete the current question before finishing.");
+    const current = questions[currentQuestionIndex];
+    if (!current.question.trim()) {
+      alert("Please enter a question.");
+      return;
+    }
+    if (current.options.filter((opt) => opt.trim()).length < 2) {
+      alert("Please provide at least two answer options.");
       return;
     }
 
-    const newQuestion = {
-      question,
-      options,
-      correctIndex,
-    };
-
-    setQuestions([...questions, newQuestion]);
     setDone(true);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     if (!questionSetName.trim() || !category.trim()) {
       alert("Please enter a set name and category.");
       return;
     }
 
-    onSubmit({
-      name: questionSetName,
-      category,
-      questions,
-    });
+    if (edit) {
+      console.log("update table");
+      // update existing table instead of creating new question set
+    } else {
+      onSubmit({ name: questionSetName, category, questions });
 
-    onClose();
+      try {
+        const setId = await createSet(
+          questionSetName,
+          category,
+          questions.length,
+          userId
+        );
+        for (const q of questions) {
+          const correctAnswer = q.options[q.correctIndex];
+          const wrongOptions = q.options.filter((_, i) => i !== q.correctIndex);
+
+          await createQuestion(
+            q.question,
+            correctAnswer,
+            wrongOptions[0] || "",
+            wrongOptions[1] || "",
+            wrongOptions[2] || "",
+            category,
+            null,
+            setId
+          );
+        }
+      } catch (err) {
+        console.error("Error creating question set:", err);
+        alert("Error creating question set. Please try again.");
+      }
+
+      onClose();
+    }
   };
 
   if (!open) return null;
+
+  // 🚨 Prevent render crash if data not loaded yet
+  if (!questions.length || !questions[currentQuestionIndex]) {
+    return (
+      <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <p>Loading question editor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const current = questions[currentQuestionIndex];
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {!done ? (
           <>
-            <h2>Creating Question {currentQuestionIndex + 1}</h2>
+            <h2>Editing Question {currentQuestionIndex + 1}</h2>
 
             <input
               type="text"
               placeholder="Enter question"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              maxLength={100}
+              value={current.question}
+              onChange={(e) => updateCurrQuestion("question", e.target.value)}
             />
 
-            {options.map((opt, i) => (
+            {current.options.map((opt, i) => (
               <div key={i}>
                 <input
                   type="text"
                   placeholder={`Option ${i + 1}`}
                   value={opt}
-                  onChange={(e) => {
-                    const updated = [...options];
-                    updated[i] = e.target.value;
-                    setOptions(updated);
-                  }}
+                  onChange={(e) => updateCurrOption(i, e.target.value)}
                 />
                 <label>
                   <input
                     type="radio"
                     name="correct"
-                    checked={correctIndex === i}
-                    onChange={() => setCorrectIndex(i)}
+                    checked={current.correctIndex === i}
+                    onChange={() => updateCurrQuestion("correctIndex", i)}
                   />
                   Correct
                 </label>
@@ -127,7 +196,15 @@ const CustomQuestionForm = ({ open, onClose, onSubmit }) => {
             ))}
 
             <div style={{ marginTop: "1rem" }}>
-              <button onClick={handleNext}>Add Another Question</button>
+              <button
+                onClick={handlePrev}
+                disabled={currentQuestionIndex === 0}
+              >
+                Previous
+              </button>
+              <button onClick={handleNext} style={{ marginLeft: "1rem" }}>
+                Next
+              </button>
               <button onClick={handleMarkDone} style={{ marginLeft: "1rem" }}>
                 Done
               </button>
