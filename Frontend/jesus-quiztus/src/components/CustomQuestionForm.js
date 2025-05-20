@@ -1,90 +1,158 @@
-import react, { useState } from "react";
+import React, { useState } from "react";
+import { createSet, createQuestion } from "../CRUD/questions";
 
-const CustomQuestionForm = ({
-  open,
-  onClose,
-  onSubmit,
-}) => {
-  const [showModal, setShowModal] = useState(false);
-  const [numQuestions, setNumQuestions] = useState(0);
+const CustomQuestionForm = ({ open, onClose, onSubmit }) => {
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [question, setQuestion] = useState("");
+  const [options, setOptions] = useState(["", "", "", ""]);
+  const [correctIndex, setCorrectIndex] = useState(0);
+  const [done, setDone] = useState(false);
   const [questionSetName, setQuestionSetName] = useState("");
-  const [setCategory, setSetCategory] = useState("");
-  //const [onClose, setOnClose] = useState(false);
-  //const [onSubmit, setOnSubmit] = useState(false);
-  const [numberQuestions, setNumberQuestions] = useState(0);
+  const [category, setCategory] = useState("");
 
-  const [questions, setQuestions] = useState(
-    Array.from({ length: numberQuestions }, () => ({
-      question: "",
-      options: ["", "", "", ""],
-      correctIndex: 0,
-    }))
-  );
 
-  const handleChange = (index, field, value) => {
-    const updated = [...questions];
-    if (field === "question") {
-      updated[index].question = value;
+  const createQuestionSet = async (name, category, questions, userId) => {
+    try {
+      const setId = await createSet(name, category, questions.length, userId);
+      for (const question of questions) {
+        await createQuestion(
+          question.question,
+          question.options[question.correctIndex],
+          question.options[0],
+          question.options[1],
+          question.options[2],
+          category,
+          null,
+          setId
+        );
+      }
     }
-    setQuestions(updated);
+    catch (error) {
+      console.error("Error creating question set:", error);   
+      alert("Error creating question set. Please try again.");
+    }
+
   };
 
-  const handleOptionChange = (index, optionIndex, value) => {
-    const updated = [...questions];
-    updated[index].options[optionIndex] = value;
-    setQuestions(updated);
+
+  const handleNext = () => {
+    if (!question.trim() || options.some((opt) => !opt.trim())) {
+      alert("Please fill in the question and all options.");
+      return;
+    }
+
+    const newQuestion = {
+      question,
+      options,
+      correctIndex,
+    };
+
+    setQuestions([...questions, newQuestion]);
+    setQuestion("");
+    setOptions(["", "", "", ""]);
+    setCorrectIndex(0);
+    setCurrentQuestionIndex((prev) => prev + 1);
   };
 
-  const handleCorrectChange = (index, value) => {
-    const updated = [...questions];
-    updated[index].correctIndex = parseInt(value);
-    setQuestions(updated);
+  const handleMarkDone = () => {
+    if (!question.trim() || options.some((opt) => !opt.trim())) {
+      alert("Please complete the current question before finishing.");
+      return;
+    }
+
+    const newQuestion = {
+      question,
+      options,
+      correctIndex,
+    };
+
+    setQuestions([...questions, newQuestion]);
+    setDone(true);
   };
 
-  const handleSubmit = () => {
-    onSubmit(questions);
+  const handleFinish = () => {
+    if (!questionSetName.trim() || !category.trim()) {
+      alert("Please enter a set name and category.");
+      return;
+    }
+
+    onSubmit({
+      name: questionSetName,
+      category,
+      questions,
+    });
+
     onClose();
   };
 
-  //if (!open) return null;
+  if (!open) return null;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Create Questions</h2>
-        {questions.map((q, i) => (
-          <div key={i} className="question-block">
+        {!done ? (
+          <>
+            <h2>Creating Question {currentQuestionIndex + 1}</h2>
+
             <input
               type="text"
-              placeholder={`Question ${i + 1}`}
-              value={q.question}
-              onChange={(e) => handleChange(i, "question", e.target.value)}
+              placeholder="Enter question"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
             />
-            {q.options.map((opt, j) => (
-              <div key={j}>
+
+            {options.map((opt, i) => (
+              <div key={i}>
                 <input
                   type="text"
-                  placeholder={`Option ${j + 1}`}
+                  placeholder={`Option ${i + 1}`}
                   value={opt}
-                  onChange={(e) => handleOptionChange(i, j, e.target.value)}
+                  onChange={(e) => {
+                    const updated = [...options];
+                    updated[i] = e.target.value;
+                    setOptions(updated);
+                  }}
                 />
                 <label>
                   <input
                     type="radio"
-                    name={`correct-${i}`}
-                    checked={q.correctIndex === j}
-                    onChange={() => handleCorrectChange(i, j)}
+                    name="correct"
+                    checked={correctIndex === i}
+                    onChange={() => setCorrectIndex(i)}
                   />
                   Correct
                 </label>
               </div>
             ))}
-            <hr />
-          </div>
-        ))}
-        <button onClick={handleSubmit} className="modal-button">
-          Save Questions
-        </button>
+
+            <div style={{ marginTop: "1rem" }}>
+              <button onClick={handleNext}>Add Another Question</button>
+              <button onClick={handleMarkDone} style={{ marginLeft: "1rem" }}>
+                Done
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>Finalize Your Question Set</h2>
+            <input
+              type="text"
+              placeholder="Enter Question Set Name"
+              value={questionSetName}
+              onChange={(e) => setQuestionSetName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Enter Category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+            <button onClick={handleFinish} style={{ marginTop: "1rem" }}>
+              Submit
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

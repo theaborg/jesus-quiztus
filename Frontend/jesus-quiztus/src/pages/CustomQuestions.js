@@ -3,7 +3,7 @@ import CustomQuestionForm from "../components/CustomQuestionForm";
 import { useState } from "react";
 
 export default function CustomQuestions() {
-  const [showQuestionModal, setShowQuestionModal] = useState(false);
+  //const [showQuestionModal, setShowQuestionModal] = useState(false);
   const [showModal, setshowModal] = useState(false);
 
   if (showModal) {
@@ -26,7 +26,7 @@ export default function CustomQuestions() {
       <button
         className="nav-button"
         onClick={() => {
-          console.log("Creaete new question set");
+          console.log("Create new question set");
           setshowModal(true);
         }}
       >

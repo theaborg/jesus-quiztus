@@ -34,14 +34,19 @@ export const getQuestionSets = async (userId) => {
 };
 
 export const createSet = async (name, category, amount, userId) => {
-  const { error } = await supabase.from("QuestionsSet").insert({
-    name: name || "Name",
-    description: category || "Category",
-    user: userId,
-    amount: amount,
-  });
+  const { data, error } = await supabase
+    .from("QuestionsSet")
+    .insert({
+      name: name || "Name",
+      description: category || "Category",
+      user: userId,
+      amount: amount,
+    })
+    .select("id")  // tror att detta hämtar tillbaka id:t
+    .single();  
 
   if (error) throw error;
+  return data.id;
 };
 
 export const createQuestion = async (
