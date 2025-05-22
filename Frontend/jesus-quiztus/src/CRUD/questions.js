@@ -14,6 +14,7 @@ export const fetchQuestions = async (questionSetId) => {
     correct: q.answer,
     category: q.category,
     image: q.image,
+    id: q.id,
   }));
 };
 
@@ -81,6 +82,7 @@ export const updateQuestion = async (
   alt3,
   category
 ) => {
+  console.log("Updating question with ID:", id);
   const { error } = await supabase
     .from("Questions")
     .update({
@@ -92,6 +94,31 @@ export const updateQuestion = async (
       category,
     })
     .eq("id", id);
+
+  if (error) throw error;
+};
+
+export const getQuestionSetInfo = async (questionSetId, userId) => {
+  const { data, error } = await supabase
+    .from("QuestionsSet")
+    .select("*")
+    .eq("id", questionSetId)
+    .eq("user", userId);
+
+  if (error) throw error;
+
+  return data;
+};
+
+
+
+export const updateQuestionsSet = async (setId, userId, name, category) => {
+  //console.log("userId in getQuestionSets: ", userId);
+  const { error } = await supabase
+    .from("QuestionsSet")
+    .update({ name: name, category: category })
+    .eq("id", setId)
+    .eq("user", userId);
 
   if (error) throw error;
 };

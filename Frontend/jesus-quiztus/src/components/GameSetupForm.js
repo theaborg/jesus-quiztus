@@ -12,7 +12,7 @@ import "../styles/GameSetupForm.scss";
  *
  */
 
-const GameSetupForm = ({ onStart }) => {
+const GameSetupForm = ({ onStart, onClose }) => {
   const [formData, setFormData] = useState({
     amount: 5,
     category: "",
@@ -63,80 +63,87 @@ const GameSetupForm = ({ onStart }) => {
   };
 
   return (
-    <div className="game-setup-div">
-      <form className="game-setup-form">
-        <div className="form-row">
-          <label className="input-label">
-            Number of Questions:
-            <input
-              className="game-setup-input"
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-            />
-          </label>
-        </div>
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <button className="modal-close" onClick={onClose}>
+          ×
+        </button>
+        <form className="game-setup-form">
+          <div className="game-setup-div">
+            <div className="form-row">
+              <label className="input-label">
+                Number of Questions:
+                <input
+                  className="game-setup-input"
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                />
+              </label>
+            </div>
 
-        <div className="form-row">
-          <label className="input-label">
-            Category:
-            <select
-              className="game-setup-input"
-              name="category"
-              onChange={handleChange}
-              value={formData.category}
-            >
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+            <div className="form-row">
+              <label className="input-label">
+                Category:
+                <select
+                  className="game-setup-input"
+                  name="category"
+                  onChange={handleChange}
+                  value={formData.category}
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-        <div className="form-row">
-          <label className="input-label">
-            Difficulty:
-            <select
-              className="game-setup-input"
-              name="difficulty"
-              onChange={handleChange}
-              value={formData.difficulty}
-            >
-              <option value="">Any</option>
-              {difficulties.slice(1).map((d) => (
-                <option key={d} value={d}>
-                  {d.charAt(0).toUpperCase() + d.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+            <div className="form-row">
+              <label className="input-label">
+                Difficulty:
+                <select
+                  className="game-setup-input"
+                  name="difficulty"
+                  onChange={handleChange}
+                  value={formData.difficulty}
+                >
+                  <option value="">Any</option>
+                  {difficulties.slice(1).map((d) => (
+                    <option key={d} value={d}>
+                      {d.charAt(0).toUpperCase() + d.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
 
-        <div className="form-row">
-          <label className="input-label">
-            Type:
-            <select
-              className="game-setup-input"
-              name="type"
-              onChange={handleChange}
-              value={formData.type}
-            >
-              <option value="">Any</option>
-              {types.slice(1).map((t) => (
-                <option key={t} value={t}>
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </form>
-      <button className="in-app-button" onClick={handleSubmit}>
-        Start Game
-      </button>
+            <div className="form-row">
+              <label className="input-label">
+                Type:
+                <select
+                  className="game-setup-input"
+                  name="type"
+                  onChange={handleChange}
+                  value={formData.type}
+                >
+                  <option value="">Any</option>
+                  {types.slice(1).map((t) => (
+                    <option key={t} value={t}>
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+        </form>
+        <button className="in-app-button" onClick={handleSubmit}>
+          Start Game
+        </button>
+      </div>
     </div>
   );
 };

@@ -18,7 +18,7 @@ export default function Navigation() {
         className="nav-button"
         onClick={async () => navigate("/custom-questions")}
       >
-        Create custom questions
+        Custom questions
       </button>
       <button className="nav-button" onClick={() => navigate("/profile")}>
         Profile

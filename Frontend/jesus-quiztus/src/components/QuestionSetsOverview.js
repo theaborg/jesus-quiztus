@@ -1,6 +1,7 @@
 import { useUser } from "../context/UserContext";
 import React, { useEffect, useState } from "react";
 import { getQuestionSets } from "../CRUD/questions";
+import { useNavigate } from "react-router-dom";
 import CustomQuestionForm from "../components/CustomQuestionForm";
 
 import "../styles/QuestionSetsOverview.scss";
@@ -11,9 +12,7 @@ export default function QuestionSetsOverview() {
   const [editableQuestionSet, setEditableQuestionSet] = useState(null);
   const [questionSets, setQuestionSets] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [numQuestions, setNumQuestions] = useState(0);
-  const [questionSetName, setQuestionSetName] = useState("");
-  const [setCategory, setSetCategory] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userId) return;
@@ -24,7 +23,12 @@ export default function QuestionSetsOverview() {
     };
 
     fetchQuestionSets();
-  }, [userId]);
+  }, [userId, showModal]);
+
+  const startGameWithSet = async (gameSetID) => {
+    //console.log("start game with set: ", gameSetID);
+    navigate("/new-game", { state: { setId : gameSetID } });
+  };
 
   if (showModal) {
     return (
@@ -61,6 +65,14 @@ export default function QuestionSetsOverview() {
               }}
             >
               Edit
+            </button>
+            <button
+              className=""
+              onClick={() => {
+                startGameWithSet(set.id);
+              }}
+            >
+              Start Game
             </button>
           </div>
         ))}

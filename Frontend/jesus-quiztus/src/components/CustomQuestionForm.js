@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { createSet, createQuestion, fetchQuestions, updateQuestion } from "../CRUD/questions";
+import {
+  createSet,
+  createQuestion,
+  fetchQuestions,
+  updateQuestion,
+  getQuestionSetInfo,
+  updateQuestionsSet,
+} from "../CRUD/questions";
 import { useUser } from "../context/UserContext";
 
 const CustomQuestionForm = ({
@@ -12,7 +19,7 @@ const CustomQuestionForm = ({
   const { userId } = useUser();
 
   const [questions, setQuestions] = useState([
-    { question: "", options: ["", "", "", ""], correctIndex: 0 },
+    { question: "", options: ["", "", "", ""], correctIndex: 0, id: null },
   ]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [done, setDone] = useState(false);
@@ -20,9 +27,18 @@ const CustomQuestionForm = ({
   const [category, setCategory] = useState("");
 
   // Load existing questions if editing
+  
   useEffect(() => {
-    const getExistingQuestions = async (questionSetId) => {
-      const existing = await fetchQuestions(questionSetId);
+    const getQuestionSet = async () => {
+      const set = await getQuestionSetInfo(editableQuestionSet, userId);
+      console.log("Set: ", set);
+      console.log("set name: ", set[0]?.name);
+      setQuestionSetName(set[0]?.name);
+      setCategory(set[0]?.category);
+    };
+
+    const getExistingQuestions = async () => {
+      const existing = await fetchQuestions(editableQuestionSet);
       const formatted = existing.map((q) => {
         const correctIndex = [
           q.alternatives[0],
@@ -34,6 +50,7 @@ const CustomQuestionForm = ({
           question: q.text,
           options: q.alternatives,
           correctIndex: correctIndex >= 0 ? correctIndex : 0,
+          id: q.id,
         };
       });
       setQuestions(
@@ -44,7 +61,8 @@ const CustomQuestionForm = ({
     };
 
     if (edit && editableQuestionSet) {
-      getExistingQuestions(editableQuestionSet);
+      getQuestionSet();
+      getExistingQuestions();
     }
   }, [edit, editableQuestionSet]);
 
@@ -103,15 +121,39 @@ const CustomQuestionForm = ({
   };
 
   const handleFinish = async () => {
-    if (!questionSetName.trim() || !category.trim()) {
-      alert("Please enter a set name and category.");
-      return;
-    }
-
     if (edit) {
       console.log("update table");
-      // update existing table instead of creating new question set
+
+      await updateQuestionsSet(
+        editableQuestionSet,
+        userId,
+        questionSetName,
+        category
+      );
+
+      for (const q of questions) {
+        const correctAnswer = q.options[q.correctIndex];
+        const wrongOptions = q.options.filter((_, i) => i !== q.correctIndex);
+
+        await updateQuestion(
+          q.id,
+          q.question,
+          correctAnswer,
+          wrongOptions[0] || "",
+          wrongOptions[1] || "",
+          wrongOptions[2] || "",
+          category,
+          null
+        );
+      }
+
+      onClose();
+      
     } else {
+      if (!questionSetName.trim() || !category.trim()) {
+        alert("Please enter a set name and category.");
+        return;
+      }
       onSubmit({ name: questionSetName, category, questions });
 
       try {
@@ -213,18 +255,20 @@ const CustomQuestionForm = ({
         ) : (
           <>
             <h2>Finalize Your Question Set</h2>
-            <input
-              type="text"
-              placeholder="Enter Question Set Name"
-              value={questionSetName}
-              onChange={(e) => setQuestionSetName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Enter Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
+            <>
+              <input
+                type="text"
+                placeholder="Enter Question Set Name"
+                value={questionSetName}
+                onChange={(e) => setQuestionSetName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Enter Category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
+            </>
             <button onClick={handleFinish} style={{ marginTop: "1rem" }}>
               Submit
             </button>

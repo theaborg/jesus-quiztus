@@ -1,6 +1,7 @@
 import { supabase } from "../supabaseClient";
 
 export const fetchGameDetails = async (gameId) => {
+  console.log("Fetching game details");
   const { data, error } = await supabase
     .from("games")
     .select("host, state, question_set")
@@ -8,7 +9,7 @@ export const fetchGameDetails = async (gameId) => {
     .single();
 
   if (error) throw error;
-
+  console.log("This was the result: ", data);
   return data;
 };
 
@@ -77,4 +78,24 @@ export const getActivePlayers = async (gameId) => {
   }
 
   return data;
+};
+
+export const createCustomGame = async (questionSetId, userId, name) => {
+  if (!name) {
+    name = "unnamed";
+  }
+  const { data, error } = await supabase
+    .from("games")
+    .insert({
+      host: userId,
+      question_set: questionSetId,
+      name: name,
+      state: "pending",
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+
+  return data.id;
 };
