@@ -27,7 +27,7 @@ const CustomQuestionForm = ({
   const [category, setCategory] = useState("");
 
   // Load existing questions if editing
-  
+
   useEffect(() => {
     const getQuestionSet = async () => {
       const set = await getQuestionSetInfo(editableQuestionSet, userId);
@@ -148,7 +148,6 @@ const CustomQuestionForm = ({
       }
 
       onClose();
-      
     } else {
       if (!questionSetName.trim() || !category.trim()) {
         alert("Please enter a set name and category.");
@@ -207,33 +206,32 @@ const CustomQuestionForm = ({
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {!done ? (
           <>
-            <h2>Editing Question {currentQuestionIndex + 1}</h2>
+            <h2> Question {currentQuestionIndex + 1}</h2>
 
-            <input
-              type="text"
+            <textarea
+              className="question-input"
               placeholder="Enter question"
-              maxLength={100}
+              maxLength={300}
+              rows={3}
               value={current.question}
               onChange={(e) => updateCurrQuestion("question", e.target.value)}
             />
 
             {current.options.map((opt, i) => (
-              <div key={i}>
+              <div className="option-row" key={i}>
                 <input
                   type="text"
                   placeholder={`Option ${i + 1}`}
                   value={opt}
                   onChange={(e) => updateCurrOption(i, e.target.value)}
                 />
-                <label>
-                  <input
-                    type="radio"
-                    name="correct"
-                    checked={current.correctIndex === i}
-                    onChange={() => updateCurrQuestion("correctIndex", i)}
-                  />
-                  Correct
-                </label>
+                <input
+                  type="radio"
+                  name="correct"
+                  checked={current.correctIndex === i}
+                  onChange={() => updateCurrQuestion("correctIndex", i)}
+                  className="radio-right"
+                />
               </div>
             ))}
 
