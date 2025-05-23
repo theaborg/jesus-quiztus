@@ -27,7 +27,7 @@ export default function QuestionSetsOverview() {
 
   const startGameWithSet = async (gameSetID) => {
     //console.log("start game with set: ", gameSetID);
-    navigate("/new-game", { state: { setId : gameSetID } });
+    navigate("/new-game", { state: { setId: gameSetID } });
   };
 
   if (showModal) {
@@ -46,36 +46,37 @@ export default function QuestionSetsOverview() {
       />
     );
   }
-
   return (
     <div className="">
       <div className="question-sets">
-        {questionSets.map((set) => (
-          <div key={set.id} className="question-set-card">
-            <h2 className="question-set-name">{set.name}</h2>
-            <p>{set.description}</p>
-            <p>Questions: {set.amount}</p>
-            <button
-              className="edit-set-button"
-              onClick={() => {
-                console.log("Edit existing question set.");
-                setEditMode(true);
-                setEditableQuestionSet(set.id);
-                setShowModal(true);
-              }}
-            >
-              Edit
-            </button>
-            <button
-              className=""
-              onClick={() => {
-                startGameWithSet(set.id);
-              }}
-            >
-              Start Game
-            </button>
-          </div>
-        ))}
+        {questionSets
+          .filter((set) => set.name !== "Trivia Game Set")
+          .map((set) => (
+            <div key={set.id} className="question-set-card">
+              <h2 className="question-set-name">{set.name}</h2>
+              <p>{set.description}</p>
+              <p>Questions: {set.amount}</p>
+              <button
+                className="edit-set-button"
+                onClick={() => {
+                  console.log("Edit existing question set.");
+                  setEditMode(true);
+                  setEditableQuestionSet(set.id);
+                  setShowModal(true);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className=""
+                onClick={() => {
+                  startGameWithSet(set.id);
+                }}
+              >
+                Start Game
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );
