@@ -8,9 +8,9 @@ const ResultView = ({ answers, questions }) => {
   return (
     <div className="result-container">
       <div className="result-card">
-        <h2>Resultat 🎉</h2>
+        <h2> Your Result! 🎉</h2>
         <p className="summary">
-          Du svarade rätt på <strong>{correctCount}</strong> av <strong>{questions.length}</strong> frågor.
+          You answered correctly at <strong>{correctCount}</strong> out of  <strong>{questions.length}</strong> quiztitions.
         </p>
 
         <ul className="answer-list">
@@ -26,14 +26,14 @@ const ResultView = ({ answers, questions }) => {
                   }}
                 />
                 <p>
-                  ✅ Rätt svar:{" "}
+                  ✅ Correct Answer:{" "}
                   <span
                     className="correct"
                     dangerouslySetInnerHTML={{ __html: answer.correct }}
                   />
                 </p>
                 <p>
-                  🧍 Ditt svar:{" "}
+                  🧍 Your Answer:{" "}
                   <span
                     className={isCorrect ? "correct" : "wrong"}
                     dangerouslySetInnerHTML={{ __html: answer.selected }}
@@ -46,7 +46,7 @@ const ResultView = ({ answers, questions }) => {
         </ul>
 
         <button className="back-button" onClick={() => navigate("/")}>
-          Till startsidan
+          Menu
         </button>
       </div>
     </div>

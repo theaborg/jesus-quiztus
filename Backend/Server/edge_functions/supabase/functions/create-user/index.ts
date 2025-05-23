@@ -42,20 +42,17 @@ serve(async (req) => {
 */
 
 import { withSupabaseHandler } from "../../utils/withSupabaseHandler.ts";
+import { CreateUser } from "../../../../../lib/users/create_user.js";
 
 export default withSupabaseHandler(async (req, supabase) => {
   const { name, nickname } = await req.json();
 
-  const { data, error } = await supabase
-    .from("Users")
-    .insert([{ name, nickname }])
-    .select();
-
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+  try {
+    const data = await CreateUser(supabase, name, nickname);
+    return new Response(JSON.stringify(data), { status: 200 });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
       status: 400,
     });
   }
-
-  return new Response(JSON.stringify(data), { status: 200 });
 });
