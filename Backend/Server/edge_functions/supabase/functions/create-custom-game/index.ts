@@ -1,41 +1,6 @@
-// backend/server/edge_functions/supabase/utils/withSupabaseHandler.ts
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// backend/server/edge_functions/supabase/functions/create-custom-game/index.ts
+import { serve } from "https://deno.land/std/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-var corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
-};
-function withSupabaseHandler(handler) {
-  serve(async (req) => {
-    if (req.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
-    }
-    try {
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL"),
-        Deno.env.get("SUPABASE_ANON_KEY"),
-        {
-          global: {
-            headers: {
-              Authorization: req.headers.get("Authorization") ?? ""
-            }
-          }
-        }
-      );
-      const response = await handler(req, supabase);
-      return new Response(await response.text(), {
-        status: response.status,
-        headers: { ...corsHeaders, ...Object.fromEntries(response.headers.entries()) }
-      });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: "Server error", details: err.message }), {
-        status: 500,
-        headers: corsHeaders
-      });
-    }
-  });
-}
 
 // backend/lib/games/create_custom_game.js
 var createCustomGame = async (supabase, questionSetId, userId, name) => {
@@ -53,19 +18,29 @@ var createCustomGame = async (supabase, questionSetId, userId, name) => {
 };
 
 // backend/server/edge_functions/supabase/functions/create-custom-game/index.ts
-var index_default = withSupabaseHandler(async (req, supabase) => {
+var corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
+};
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const { questionSetId, userId, name } = await req.json();
+  if (!questionSetId || !userId) {
+    return new Response("Missing questionSetId or userId", { status: 400, headers: corsHeaders });
+  }
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_ANON_KEY"),
+    { global: { headers: { Authorization: req.headers.get("Authorization") } } }
+  );
   try {
-    const { questionSetId, userId, name } = await req.json();
-    if (!questionSetId || !userId) {
-      return new Response(JSON.stringify({ error: "Missing questionSetId or userId" }), { status: 400 });
-    }
-    const gameId = await createCustomGame(supabase, questionSetId, userId, name);
-    return new Response(JSON.stringify({ gameId }), { status: 200 });
+    const id = await createCustomGame(supabase, questionSetId, userId, name);
+    return new Response(JSON.stringify({ id }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
+    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
   }
 });
-export {
-  index_default as default
-};
 //# sourceMappingURL=index.mjs.map

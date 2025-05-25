@@ -1,7 +1,7 @@
-export async function setGameState(gameId, new_state, access_token) {
+export async function setState(gameId, new_state, access_token) {
   try {
     const response = await fetch(
-      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/set_game_state",
+      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/set-game-state",
       {
         method: "POST",
         headers: {

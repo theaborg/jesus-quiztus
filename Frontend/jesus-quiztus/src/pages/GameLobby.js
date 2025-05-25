@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { initGame } from "../api/initGame";
 import { supabase } from "../supabaseClient";
 import Modal from "../components/Modal";
 import LobbyView from "../components/LobbyView";
@@ -11,12 +10,21 @@ import TimerBar from "../components/TimerBar";
 import { setGame } from "../CRUD/users";
 import { getPlayersWithAvatars } from "../CRUD/users";
 
-import { fetchGameDetails } from "../CRUD/games";
-import { setState } from "../CRUD/games";
-import { setGameStartTime } from "../CRUD/games";
-import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
-import { getGameStartTime } from "../CRUD/games";
-import { getActivePlayers } from "../CRUD/games";
+import { fetchGameDetails } from "../api/game/getGameDetails";
+import { getActivePlayers } from "../api/game/getActivePlayers";
+import { setGameStartTime } from "../api/game/setGameStartTime";
+import { getGameStartTime } from "../api/game/getGameStartTime";
+import { initGame } from "../api/initGame";
+import { setState } from "../api/game/setGameState";
+
+import { getQuestions as fetchQuestionsFromDb } from "../api/questions/getQuestions";
+
+//import { fetchGameDetails } from "../CRUD/games";
+//import { setState } from "../CRUD/games";
+//import { setGameStartTime } from "../CRUD/games";
+//import { fetchQuestions as fetchQuestionsFromDb } from "../CRUD/questions";
+//import { getGameStartTime } from "../CRUD/games";
+//import { getActivePlayers } from "../CRUD/games";
 
 import { getRandomPowerup } from "../components/Powerup";
 import powerups from "../components/Powerup";
@@ -55,14 +63,28 @@ const GameLobby = () => {
 
     const loadGameDetails = async () => {
       try {
-        const data = await fetchGameDetails(gameId);
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
+        console.log("Raw gameId:", gameId);
+
+        const resp = await fetchGameDetails(
+          gameId.id ?? gameId,
+          session.access_token
+        );
+        const data = JSON.parse(resp.data);
+        console.log("Game data:", data);
         setHostId(data.host);
         setGameState(data.state);
         setQuestionSetId(data.question_set);
 
         if (data.state === "active") {
-          const formatted = await fetchQuestionsFromDb(data.question_set);
+          const formattedData = await fetchQuestionsFromDb(
+            data.question_set,
+            session.access_token
+          );
+          const formatted = JSON.parse(formattedData.data);
           setQuestions(formatted);
         }
 
@@ -85,7 +107,12 @@ const GameLobby = () => {
       //const activePlayers = await getActivePlayers(gameId);
       //setPlayers(activePlayers || []);
 
-      const activePlayers = await getActivePlayers(gameId);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const resp = await getActivePlayers(gameId, session.access_token);
+      const activePlayers = JSON.parse(resp.data);
 
       // For each player, fetch their profile image
       const playersWithAvatars = await Promise.all(
@@ -138,13 +165,19 @@ const GameLobby = () => {
           filter: `id=eq.${gameId}`,
         },
         async (payload) => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
           const newState = payload.new.state;
           const isHost = userId === payload.new.host;
 
           if (newState === "active" && prevGameStateRef.current !== "active") {
-            const formatted = await fetchQuestionsFromDb(
-              payload.new.question_set
+            const formattedData = await fetchQuestionsFromDb(
+              payload.new.question_set,
+              session.access_token
             );
+            const formatted = JSON.parse(formattedData.data);
             setQuestions(formatted);
             setCurrentQuestionIndex(0);
 
@@ -209,6 +242,10 @@ const GameLobby = () => {
 
     const setupTimer = async () => {
       // Host sets start time and saves to DB
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       const isHost = userId === hostId;
 
       let start;
@@ -217,13 +254,15 @@ const GameLobby = () => {
         const newStartDate = new Date();
         const formatted = newStartDate.toTimeString().split(" ")[0];
         setStartTime(formatted);
-        await setGameStartTime(gameId, formatted);
+        await setGameStartTime(gameId, formatted, session.access_token);
         start = formatted;
       } else {
         // Non-host fetches start time from DB
-        let response = await getGameStartTime(gameId);
+        let responseData = await getGameStartTime(gameId, session.access_token);
+        let response = JSON.parse(responseData.data);
         while (!response || response.length === 0 || !response[0].start_time) {
-          response = await getGameStartTime(gameId);
+          responseData = await getGameStartTime(gameId, session.access_token);
+          response = JSON.parse(responseData.data);
         }
         start = response[0].start_time;
         setStartTime(start);
@@ -231,6 +270,10 @@ const GameLobby = () => {
 
       // Begin countdown
       interval = setInterval(async () => {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         const currTime = new Date().toTimeString().split(" ")[0];
         const elapsed =
           timeStringToSeconds(currTime) - timeStringToSeconds(start);
@@ -251,7 +294,7 @@ const GameLobby = () => {
             setGameState("over");
 
             if (hostId === userId) {
-              await setState(gameId, "over");
+              await setState(gameId, "over", session.access_token);
             }
           }
         }
@@ -264,11 +307,15 @@ const GameLobby = () => {
   }, [currentQuestionIndex, questions.length, userId, hostId, gameId]);
 
   const handleFirstQuestion = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     const currTime = new Date();
     const formattedTime = currTime.toTimeString().split(" ")[0];
 
     setStartTime(formattedTime);
-    await setGameStartTime(gameId, formattedTime);
+    await setGameStartTime(gameId, formattedTime, session.access_token);
   };
 
   const handleStartGame = async () => {

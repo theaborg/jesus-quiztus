@@ -4,11 +4,13 @@ import GameSetupForm from "../components/GameSetupForm";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useState, useEffect } from "react";
-import { createCustomGame } from "../CRUD/games";
+
+import { createCustomGame } from "../api/game/createCustomGame";
+//import { createCustomGame } from "../CRUD/games";
 import { UpdatePassword } from "@supabase/auth-ui-react";
 
 /**
- *
+ * Game.js
  */
 
 export default function Game() {
@@ -21,8 +23,14 @@ export default function Game() {
 
   useEffect(() => {
     const startCustomGame = async () => {
-      const result = await createCustomGame(fromCustom, userId);
-      navigate(`/lobby/${result}`);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const name = "unnamed";
+      const resultData = await createCustomGame(fromCustom, userId, name, session.access_token);
+      const result = JSON.parse(resultData.data);
+      //console.log("Custom game created:", result.id);
+      navigate(`/lobby/${result.id}`);
     };
 
     if (fromCustom != null) {

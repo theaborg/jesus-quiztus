@@ -21,7 +21,7 @@ export const fetchQuestions = async (questionSetId) => {
 const shuffle = (array) => array.sort(() => Math.random() - 0.5);
 
 export const getQuestionSets = async (userId) => {
-  console.log("userId in getQuestionSets: ", userId);
+  //console.log("userId in getQuestionSets: ", userId);
   const { data, error } = await supabase
     .from("QuestionsSet")
     .select("*")
@@ -29,7 +29,7 @@ export const getQuestionSets = async (userId) => {
 
   if (error) throw error;
 
-  console.log("data in getQuestionSets: ", data);
+  //console.log("data in getQuestionSets: ", data);
   return data; //.map((set) => ({id: set.id,name: set.name,description: set.description,}));
 };
 

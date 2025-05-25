@@ -1,41 +1,6 @@
-// backend/server/edge_functions/supabase/utils/withSupabaseHandler.ts
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// backend/server/edge_functions/supabase/functions/get-game-details/index.ts
+import { serve } from "https://deno.land/std/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-var corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
-};
-function withSupabaseHandler(handler) {
-  serve(async (req) => {
-    if (req.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
-    }
-    try {
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL"),
-        Deno.env.get("SUPABASE_ANON_KEY"),
-        {
-          global: {
-            headers: {
-              Authorization: req.headers.get("Authorization") ?? ""
-            }
-          }
-        }
-      );
-      const response = await handler(req, supabase);
-      return new Response(await response.text(), {
-        status: response.status,
-        headers: { ...corsHeaders, ...Object.fromEntries(response.headers.entries()) }
-      });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: "Server error", details: err.message }), {
-        status: 500,
-        headers: corsHeaders
-      });
-    }
-  });
-}
 
 // backend/lib/games/get_game_details.js
 var getGameDetails = async (supabase, gameId) => {
@@ -45,19 +10,49 @@ var getGameDetails = async (supabase, gameId) => {
 };
 
 // backend/server/edge_functions/supabase/functions/get-game-details/index.ts
-var index_default = withSupabaseHandler(async (req, supabase) => {
-  try {
-    const { gameId } = await req.json();
-    if (!gameId) {
-      return new Response(JSON.stringify({ error: "Missing gameId" }), { status: 400 });
+var corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
+};
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+  const { gameId } = await req.json();
+  if (!gameId) {
+    return new Response("Missing gameId", {
+      status: 400,
+      headers: corsHeaders
+    });
+  }
+  const supabase = createClient(
+    "https://rixhhkmrhhmiajvxrfli.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpeGhoa21yaGhtaWFqdnhyZmxpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwMTg3MDgsImV4cCI6MjA1OTU5NDcwOH0.0vubc3l45l2WK8QBlFZNqZwjzJ-1TopoHC1cljVD7RM",
+    {
+      global: {
+        headers: {
+          Authorization: req.headers.get("Authorization")
+        }
+      }
     }
-    const result = await getGameDetails(supabase, gameId);
-    return new Response(JSON.stringify(result), { status: 200 });
+  );
+  try {
+    const gameDetails = await getGameDetails(supabase, gameId);
+    return new Response(JSON.stringify(gameDetails), {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json"
+      },
+      status: 200
+    });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: corsHeaders
+      }
+    );
   }
 });
-export {
-  index_default as default
-};
 //# sourceMappingURL=index.mjs.map

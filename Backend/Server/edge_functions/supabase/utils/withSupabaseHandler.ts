@@ -7,16 +7,19 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
 };
 
-export function withSupabaseHandler(handler: (req: Request, supabase: ReturnType<typeof createClient>) => Promise<Response>) {
-  serve(async (req: Request) => {
+export function withSupabaseHandler(handler) {
+  serve(async (req) => {
     if (req.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
+      return new Response("ok", {
+        status: 200,
+        headers: corsHeaders,
+      });
     }
 
     try {
       const supabase = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
+        Deno.env.get("SUPABASE_URL"),
+        Deno.env.get("SUPABASE_ANON_KEY"),
         {
           global: {
             headers: {
@@ -26,16 +29,28 @@ export function withSupabaseHandler(handler: (req: Request, supabase: ReturnType
         }
       );
 
+      // 🟡 call the handler
       const response = await handler(req, supabase);
-      return new Response(await response.text(), {
+
+      // 🟢 ensure CORS headers on all responses
+      const headers = new Headers(response.headers);
+      for (const [key, value] of Object.entries(corsHeaders)) {
+        headers.set(key, value);
+      }
+
+      return new Response(response.body, {
         status: response.status,
-        headers: { ...corsHeaders, ...Object.fromEntries(response.headers.entries()) }
+        statusText: response.statusText,
+        headers,
       });
     } catch (err) {
-      return new Response(JSON.stringify({ error: "Server error", details: err.message }), {
-        status: 500,
-        headers: corsHeaders
-      });
+      return new Response(
+        JSON.stringify({ error: "Server error", details: err.message }),
+        {
+          status: 500,
+          headers: corsHeaders,
+        }
+      );
     }
   });
 }
