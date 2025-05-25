@@ -37,27 +37,27 @@ function withSupabaseHandler(handler) {
   });
 }
 
-// backend/lib/users/create_user.js
-var CreateUser = async (supabase, name, nickname) => {
-  const { data, error } = await supabase.from("Users").insert([{ name, nickname }]).select();
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400
-    });
-  }
-  return new Response(JSON.stringify(data), { status: 200 });
+// backend/lib/questions/create_set.js
+var createSet = async (supabase, name, category, amount, userId) => {
+  const { data, error } = await supabase.from("QuestionsSet").insert({
+    name: name || "Name",
+    category: category || "Category",
+    user: userId,
+    amount
+  }).select("id").single();
+  if (error) throw error;
+  return data.id;
 };
 
-// backend/server/edge_functions/supabase/functions/create-user/index.ts
+// backend/server/edge_functions/supabase/functions/create-set/index.ts
 var index_default = withSupabaseHandler(async (req, supabase) => {
-  const { name, nickname } = await req.json();
   try {
-    const data = await CreateUser(supabase, name, nickname);
-    return new Response(JSON.stringify(data), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 400
-    });
+    const { name, category, amount, userId } = await req.json();
+    if (!userId || amount === void 0) return new Response(JSON.stringify({ error: "Missing userId or amount" }), { status: 400 });
+    const setId = await createSet(supabase, name, category, amount, userId);
+    return new Response(JSON.stringify({ setId }), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
   }
 });
 export {

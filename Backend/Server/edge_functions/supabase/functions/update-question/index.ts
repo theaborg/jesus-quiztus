@@ -37,27 +37,29 @@ function withSupabaseHandler(handler) {
   });
 }
 
-// backend/lib/users/create_user.js
-var CreateUser = async (supabase, name, nickname) => {
-  const { data, error } = await supabase.from("Users").insert([{ name, nickname }]).select();
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400
-    });
-  }
-  return new Response(JSON.stringify(data), { status: 200 });
+// backend/lib/questions/update_question.js
+var updateQuestion = async (supabase, id, question, answer, alt1, alt2, alt3, category) => {
+  console.log("Updating question with ID:", id);
+  const { error } = await supabase.from("Questions").update({
+    question,
+    answer,
+    alt_1: alt1,
+    alt_2: alt2,
+    alt_3: alt3,
+    category
+  }).eq("id", id);
+  if (error) throw error;
 };
 
-// backend/server/edge_functions/supabase/functions/create-user/index.ts
+// backend/server/edge_functions/supabase/functions/update-question/index.ts
 var index_default = withSupabaseHandler(async (req, supabase) => {
-  const { name, nickname } = await req.json();
   try {
-    const data = await CreateUser(supabase, name, nickname);
-    return new Response(JSON.stringify(data), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 400
-    });
+    const { id, question, answer, alt1, alt2, alt3, category } = await req.json();
+    if (!id) return new Response(JSON.stringify({ error: "Missing question ID" }), { status: 400 });
+    await updateQuestion(supabase, id, question, answer, alt1, alt2, alt3, category);
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
   }
 });
 export {

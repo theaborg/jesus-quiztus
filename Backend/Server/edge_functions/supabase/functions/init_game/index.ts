@@ -58,6 +58,8 @@ serve(async (req) => {
     .update({ state: "active" })
     .eq("id", gameId);
 
+
+    
   if (startError) {
     return new Response(`Failed to start game: ${startError.message}`, {
       status: 500,
@@ -65,26 +67,6 @@ serve(async (req) => {
     });
   }
 
-  /*
-  // 2. Vänta 5 sekunder per fråga
-  const totalTime = questionCount * 5 * 1000;
-  console.log(`Game ${gameId} active for ${totalTime}ms`);
-
-  await new Promise((res) => setTimeout(res, totalTime));
-
-  // 3. Sätt state till "over"
-  const { error: endError } = await supabase
-    .from("games")
-    .update({ state: "over" })
-    .eq("id", gameId);
-
-  if (endError) {
-    return new Response(`Failed to end game: ${endError.message}`, {
-      status: 500,
-      headers: corsHeaders,
-    });
-  }
-  */
 
   return new Response("Game started and will end automatically.", {
     headers: corsHeaders,

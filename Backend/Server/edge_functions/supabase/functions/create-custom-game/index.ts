@@ -37,27 +37,32 @@ function withSupabaseHandler(handler) {
   });
 }
 
-// backend/lib/users/create_user.js
-var CreateUser = async (supabase, name, nickname) => {
-  const { data, error } = await supabase.from("Users").insert([{ name, nickname }]).select();
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400
-    });
+// backend/lib/games/create_custom_game.js
+var createCustomGame = async (supabase, questionSetId, userId, name) => {
+  if (!name) {
+    name = "unnamed";
   }
-  return new Response(JSON.stringify(data), { status: 200 });
+  const { data, error } = await supabase.from("games").insert({
+    host: userId,
+    question_set: questionSetId,
+    name,
+    state: "pending"
+  }).select("id").single();
+  if (error) throw error;
+  return data.id;
 };
 
-// backend/server/edge_functions/supabase/functions/create-user/index.ts
+// backend/server/edge_functions/supabase/functions/create-custom-game/index.ts
 var index_default = withSupabaseHandler(async (req, supabase) => {
-  const { name, nickname } = await req.json();
   try {
-    const data = await CreateUser(supabase, name, nickname);
-    return new Response(JSON.stringify(data), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 400
-    });
+    const { questionSetId, userId, name } = await req.json();
+    if (!questionSetId || !userId) {
+      return new Response(JSON.stringify({ error: "Missing questionSetId or userId" }), { status: 400 });
+    }
+    const gameId = await createCustomGame(supabase, questionSetId, userId, name);
+    return new Response(JSON.stringify({ gameId }), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
   }
 });
 export {

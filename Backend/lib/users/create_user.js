@@ -11,4 +11,4 @@ export const CreateUser = async (supabase, name, nickname) => {
   }
 
   return new Response(JSON.stringify(data), { status: 200 });
-});
+};

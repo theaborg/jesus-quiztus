@@ -37,27 +37,27 @@ function withSupabaseHandler(handler) {
   });
 }
 
-// backend/lib/users/create_user.js
-var CreateUser = async (supabase, name, nickname) => {
-  const { data, error } = await supabase.from("Users").insert([{ name, nickname }]).select();
+// backend/lib/games/get_active_players.js
+var getActivePlayers = async (supabase, gameId) => {
+  const { data, error } = await supabase.from("users").select("nickname, id").eq("game", gameId);
   if (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400
-    });
+    console.error("Error in getActivePlayers:", error.message);
+    return null;
   }
-  return new Response(JSON.stringify(data), { status: 200 });
+  return data;
 };
 
-// backend/server/edge_functions/supabase/functions/create-user/index.ts
+// backend/server/edge_functions/supabase/functions/get-active-players/index.ts
 var index_default = withSupabaseHandler(async (req, supabase) => {
-  const { name, nickname } = await req.json();
   try {
-    const data = await CreateUser(supabase, name, nickname);
-    return new Response(JSON.stringify(data), { status: 200 });
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 400
-    });
+    const { gameId } = await req.json();
+    if (!gameId) {
+      return new Response(JSON.stringify({ error: "Missing gameId" }), { status: 400 });
+    }
+    const result = await getActivePlayers(supabase, gameId);
+    return new Response(JSON.stringify(result), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
   }
 });
 export {
