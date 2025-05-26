@@ -1,43 +1,33 @@
 import { useUser } from "../context/UserContext";
 import { supabase } from "../supabaseClient";
 import { useEffect, useState } from "react";
-import { editNickname } from "../api/editNickname";
-import { updateProfilePicture } from "../api/updateProfilePicture";
+import { editNickname, updateProfilePicture, getUser } from "../api/userApi";
 import "../styles/UpdateProfileForm.scss";
 
 export default function UpdateProfileForm() {
-  const { session, displayName } = useUser("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const { session, displayName } = useUser();
+  const [profilePictureUrl, setAvatarUrl] = useState("");
   const [nickname, setNickname] = useState("");
+  const [isEditable, setIsEditable] = useState(false);
 
-  const getProfileImage = async () => {
-    if (!session?.user) return;
-
-    const { data, error } = await supabase
-      .from("users")
-      .select("profile_picture")
-      .eq("id", session.user.id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching profile_url:", error.message);
-      return;
-    }
-    if (data.profile_picture) {
-      const { data: urlData, error: urlError } = supabase.storage
-        .from("profile-pictures")
-        .getPublicUrl(`${session.user.id}/${data.profile_picture}`);
-
-      if (urlError) {
-        console.error("Error getting public URL:", urlError.message);
+  async function getProfile() {
+    try {
+      const profile = await getUser(session.user.id, session.access_token);
+      if (profile.success) {
+        setAvatarUrl(profile.data.profilePictureUrl || "/profile_picture.jpg");
+        setNickname(profile.data.nickname || displayName);
       } else {
-        setAvatarUrl(urlData.publicUrl);
+        console.error("Failed to fetch user profile:", profile.error);
       }
+    } catch (error) {
+      console.error("Error fetching user profile:", error.message);
     }
-  };
+  }
 
   useEffect(() => {
-    getProfileImage();
+    if (!session) return;
+    console.log("Session in UpdateProfileForm:", session.user.id);
+    getProfile();
   }, [session]);
 
   const handleImageUpload = async (e) => {
@@ -48,14 +38,12 @@ export default function UpdateProfileForm() {
         session.access_token
       );
       if (result.success) {
-        console.log("Public URL:", result.publicUrl);
         setAvatarUrl(result.publicUrl);
       }
     } catch (error) {
       console.error("Error updating profile picture:", error.message);
       alert("Something went wrong. Please try again.");
     }
-    getProfileImage();
   };
 
   const handleNicknameChange = async (e) => {
@@ -74,15 +62,13 @@ export default function UpdateProfileForm() {
     }
   };
 
-  const [isEditable, setIsEditable] = useState("");
-
   return (
     <div className="profile-form">
       <div className="nickname-container">
         {/* <div className="profile-picture-container"> */}
         <label className="second-header-text">Profile picture</label>
         <img
-          src={avatarUrl || "/profile_picture.jpg"}
+          src={profilePictureUrl || "/profile_picture.jpg"}
           alt="Profile"
           className="profile-image"
         />
@@ -104,7 +90,7 @@ export default function UpdateProfileForm() {
           className={`nickname-input ${
             !isEditable ? "display-nickname-input" : "edit-nickname-input"
           }`}
-          type="Nickname"
+          type="text"
           placeholder={displayName}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}

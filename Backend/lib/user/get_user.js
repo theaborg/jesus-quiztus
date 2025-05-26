@@ -1,5 +1,5 @@
-export const getUser = async (userId) => {
-  const { data, error } = await supabase
+export const getUser = async (supabaseClient, userId) => {
+  const { data, error } = await supabaseClient
     .from("users")
     .select("id, nickname, profile_picture")
     .eq("id", userId)
@@ -10,7 +10,7 @@ export const getUser = async (userId) => {
   }
   let avatarUrl = "/profile_picture.jpg"; // fallback
   if (data?.profile_picture) {
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseClient.storage
       .from("profile-pictures")
       .getPublicUrl(`${userId}/${data.profile_picture}`);
     avatarUrl = urlData?.publicUrl || avatarUrl;

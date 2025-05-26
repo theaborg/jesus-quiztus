@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import UserSearch from "../components/UserSearch";
-import { getFriends, setFriendStatus } from "../CRUD/friends";
-import { getFriendRequests } from "../CRUD/friends";
+import {
+  getFriends,
+  answerFriendRequest,
+  getFriendRequests,
+} from "../api/friendsApi";
 import { supabase } from "../supabaseClient";
-import { getUser } from "../CRUD/users";
+import { getUser } from "../api/userApi";
 
 export default function Friends() {
   const { session } = useUser();
@@ -41,28 +44,37 @@ export default function Friends() {
     if (!userId) return;
 
     const fetchFriendsData = async () => {
-      // get friends
-      const fetchedFriends = await getFriends(userId);
-      console.log("Fetched friends: ", fetchedFriends);
+      const fetchedFriends = await getFriends(userId, session.access_token);
+      console.log("Fetched friends: ", fetchedFriends.data);
       let friendUsers = [];
-      for (const relation of fetchedFriends) {
+      for (const relation of fetchedFriends.data) {
         const otherId =
           relation.user_id !== userId ? relation.user_id : relation.friend_id;
-        const friendUser = await getUser(otherId);
-        friendUsers.push(friendUser);
+        const friendUser = await getUser(otherId, session.access_token);
+        friendUsers.push(friendUser.data);
       }
       console.log("friend users: ", friendUsers);
       setFriends(friendUsers);
 
       // get friend requests
-      const fetchedRequests = await getFriendRequests(userId);
-      const requestArray = Object.values(fetchedRequests);
+      const fetchedRequests = await getFriendRequests(
+        userId,
+        session.access_token
+      );
+      console.log("Fetched friend requests: ", fetchedRequests);
+
+      const requestArray = await getFriendRequests(
+        userId,
+        session.access_token
+      );
+      console.log("Request array: ", requestArray);
       const userRequests = await Promise.all(
         requestArray.map(async (request) => {
-          const user = await getUser(request.user_id);
-          return user;
+          const user = await getUser(request.user_id, session.access_token);
+          return user.data;
         })
       );
+      console.log("User requests: ", userRequests);
       setFriendRequests(userRequests);
     };
     fetchFriendsData();
@@ -78,7 +90,7 @@ export default function Friends() {
 
   const handleAcceptFriendRequest = async (friendId, answer) => {
     console.log("accept request");
-    await setFriendStatus(userId, friendId, answer);
+    await answerFriendRequest(userId, friendId, answer, session.access_token);
   };
 
   return (

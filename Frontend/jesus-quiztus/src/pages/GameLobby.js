@@ -8,8 +8,7 @@ import LobbyView from "../components/LobbyView";
 import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
 import TimerBar from "../components/TimerBar";
-import { setGame } from "../CRUD/users";
-import { getPlayersWithAvatars } from "../CRUD/users";
+import { setGameForUser, getUser } from "../api/userApi";
 
 import { fetchGameDetails } from "../CRUD/games";
 import { setState } from "../CRUD/games";
@@ -25,7 +24,7 @@ const GameLobby = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
   const prevGameStateRef = useRef();
-  const { userId, displayName } = useUser();
+  const { userId, displayName, session } = useUser();
 
   const [hostId, setHostId] = useState("");
   const [gameState, setGameState] = useState("waiting");
@@ -90,7 +89,7 @@ const GameLobby = () => {
       // For each player, fetch their profile image
       const playersWithAvatars = await Promise.all(
         (activePlayers || []).map(async (p) => {
-          return getPlayersWithAvatars(p);
+          return getUser(p.id, session.access_token);
         })
       );
 
@@ -318,9 +317,9 @@ const GameLobby = () => {
     );
   } else if (gameState !== "active") {
     if (userId != null) {
-      setGame(gameId, userId);
+      setGameForUser(gameId, userId, session.access_token);
     }
-    //setGame(gameId, userId);
+    //setGameForUser(gameId, userId);
     return (
       <LobbyView
         isHost={userId === hostId}

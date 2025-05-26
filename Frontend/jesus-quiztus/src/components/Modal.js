@@ -2,11 +2,10 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import "../styles/Modal.scss";
-import { sendPowerup } from "../CRUD/powerups";
+import { sendPowerup } from "../api/powerupApi";
 
 /**
  * TODO:
- * - Lyfta ut CSS till egen fil där all annan css ligger
  * - Fortsätta snygga till och anpassa för eventuellt andra invites som friends reqs osv.
  *
  */
@@ -20,7 +19,7 @@ const Modal = ({
   activePowerUp,
 }) => {
   const { gameId } = useParams();
-  const { userId } = useUser();
+  const { userId, session } = useUser();
 
   if (!open) return null;
 
@@ -40,7 +39,13 @@ const Modal = ({
   };
 
   const sendPowerUpToUser = async (receiver_id) => {
-    await sendPowerup(gameId, userId, receiver_id, activePowerUp.type);
+    await sendPowerup(
+      gameId,
+      userId,
+      receiver_id,
+      activePowerUp.type,
+      session.access_token
+    );
     onClose();
   };
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import { useUser } from "../context/UserContext";
-import { addFriend } from "../api/addFriend";
+import { addFriend } from "../api/friendsApi";
 import "../styles/UserSearch.scss";
 
 const UserSearch = ({ currentUserId }) => {
