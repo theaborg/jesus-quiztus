@@ -129,7 +129,12 @@ const GameLobby = () => {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      let players = await getActivePlayers(gameId);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      let resp = await getActivePlayers(gameId, session.access_token);
+      let players = JSON.parse(resp.data);
       setPlayers(players);
     };
 

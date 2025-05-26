@@ -1,7 +1,27 @@
-export async function updateQuestion(id, question, answer, alt1, alt2, alt3, category, _unused, access_token) {
+export async function updateQuestion(
+  id,
+  question,
+  answer,
+  alt1,
+  alt2,
+  alt3,
+  category,
+  _unused,
+  access_token
+) {
   if (!access_token) {
     console.error("updateQuestion called without access token");
     return { error: "Missing access token" };
+  }
+
+  if (!id || !question || !answer || !category) {
+    console.error("Missing required fields:", {
+      id,
+      question,
+      answer,
+      category,
+    });
+    return { error: "Missing required fields" };
   }
 
   try {
