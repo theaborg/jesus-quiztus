@@ -11,7 +11,6 @@ export default function Auth() {
   /*
   Function for testing with fake email addresses.
   
-  
   function generateFakeEmail(domain = "example.com") {
     const randomString = Math.random().toString(36).substring(2, 10); // 8-char random string
     const username = `user_${randomString}`;
@@ -51,7 +50,7 @@ export default function Auth() {
 
   return (
     <form onSubmit={handleSignUp}>
-      <h2>Skapa konto</h2>
+      <h2>Register</h2>
       <input
         type="email"
         placeholder="Email"
@@ -73,7 +72,7 @@ export default function Auth() {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <button type="submit">Registrera</button>
+      <button type="submit">Create Account</button>
       {message && <p>{message}</p>}
     </form>
   );

@@ -1,4 +1,4 @@
-export const CreateUser = async (nickname) => {
+export const CreateUser = async (supabase, name, nickname) => {
   const { data, error } = await supabase
     .from("Users")
     .insert([{ name, nickname }])
@@ -11,4 +11,4 @@ export const CreateUser = async (nickname) => {
   }
 
   return new Response(JSON.stringify(data), { status: 200 });
-});
+};

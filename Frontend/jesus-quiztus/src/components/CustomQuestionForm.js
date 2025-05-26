@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {
-  createSet,
-  createQuestion,
-  fetchQuestions,
-  updateQuestion,
-  getQuestionSetInfo,
-  updateQuestionsSet,
-} from "../CRUD/questions";
+import { supabase } from "../supabaseClient";
+
+import { getQuestions as fetchQuestions } from "../api/questions/getQuestions";
+import { getQuestionSetInfo } from "../api/questions/getQuestionSetInfo";
+import { updateQuestionsSet } from "../api/questions/updateQuestionSet";
+import { createQuestion } from "../api/questions/createQuestion";
+import { updateQuestion } from "../api/questions/updateQuestion";
+import { createSet } from "../api/questions/createSet";
+
 import { useUser } from "../context/UserContext";
 
 const CustomQuestionForm = ({
@@ -30,15 +31,28 @@ const CustomQuestionForm = ({
 
   useEffect(() => {
     const getQuestionSet = async () => {
-      const set = await getQuestionSetInfo(editableQuestionSet, userId);
-      console.log("Set: ", set);
-      console.log("set name: ", set[0]?.name);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const setData = await getQuestionSetInfo(editableQuestionSet, userId, session.access_token);
+      const set = JSON.parse(setData.data);
+      //console.log("Set: ", set);
+      //console.log("set name: ", set[0]?.name);
       setQuestionSetName(set[0]?.name);
       setCategory(set[0]?.category);
     };
 
     const getExistingQuestions = async () => {
-      const existing = await fetchQuestions(editableQuestionSet);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const existingData = await fetchQuestions(
+        editableQuestionSet,
+        session.access_token
+      );
+      const existing = JSON.parse(existingData.data);
       const formatted = existing.map((q) => {
         const correctIndex = [
           q.alternatives[0],
@@ -122,19 +136,29 @@ const CustomQuestionForm = ({
 
   const handleFinish = async () => {
     if (edit) {
-      console.log("update table");
+      //console.log("update table");
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        console.error("Missing or invalid session");
+        return;
+      }
 
       await updateQuestionsSet(
         editableQuestionSet,
         userId,
         questionSetName,
-        category
+        category,
+        session.access_token
       );
 
       for (const q of questions) {
         const correctAnswer = q.options[q.correctIndex];
         const wrongOptions = q.options.filter((_, i) => i !== q.correctIndex);
-
+        //console.log("Session:", session.access_token);
         await updateQuestion(
           q.id,
           q.question,
@@ -143,7 +167,8 @@ const CustomQuestionForm = ({
           wrongOptions[1] || "",
           wrongOptions[2] || "",
           category,
-          null
+          null,
+          session.access_token
         );
       }
 
@@ -156,12 +181,19 @@ const CustomQuestionForm = ({
       onSubmit({ name: questionSetName, category, questions });
 
       try {
-        const setId = await createSet(
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const setIdData = await createSet(
           questionSetName,
           category,
           questions.length,
-          userId
+          userId,
+          session.access_token
         );
+        const setId = JSON.parse(setIdData.data);
+        //console.log("Set ID:", setId.id);
         for (const q of questions) {
           const correctAnswer = q.options[q.correctIndex];
           const wrongOptions = q.options.filter((_, i) => i !== q.correctIndex);
@@ -174,7 +206,8 @@ const CustomQuestionForm = ({
             wrongOptions[2] || "",
             category,
             null,
-            setId
+            setId.id,
+            session.access_token
           );
         }
       } catch (err) {
