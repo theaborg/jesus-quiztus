@@ -9,7 +9,6 @@ export const fetchGameDetails = async (gameId) => {
     .single();
 
   if (error) throw error;
-  console.log("This was the result: ", data);
   return data;
 };
 

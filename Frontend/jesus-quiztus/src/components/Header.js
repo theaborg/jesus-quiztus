@@ -17,7 +17,7 @@ export default function Header() {
         className={`header-img ${
           !session?.user ? "login-header-img" : "default-header-img"
         }`}
-        src="temp_logo.png"
+        src="images/jesus-quiztus.png"
         alt="Jesus"
       />
       <h1 className="header-text">Jesus Quiztus</h1>

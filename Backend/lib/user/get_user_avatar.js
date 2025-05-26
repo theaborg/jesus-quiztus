@@ -5,7 +5,7 @@ export const getUserAvatar = async (supabaseClient, player) => {
     .eq("id", player.id)
     .single();
 
-  let avatarUrl = "/profile_picture.jpg"; // fallback
+  let avatarUrl = "/images/profile_picture.jpg"; // fallback
 
   if (data?.profile_picture) {
     const { data: urlData, error: storageError } = supabaseClient.storage

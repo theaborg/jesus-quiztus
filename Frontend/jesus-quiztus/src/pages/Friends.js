@@ -45,7 +45,6 @@ export default function Friends() {
 
     const fetchFriendsData = async () => {
       const fetchedFriends = await getFriends(userId, session.access_token);
-      console.log("Fetched friends: ", fetchedFriends.data);
       let friendUsers = [];
       for (const relation of fetchedFriends.data) {
         const otherId =
@@ -53,7 +52,6 @@ export default function Friends() {
         const friendUser = await getUser(otherId, session.access_token);
         friendUsers.push(friendUser.data);
       }
-      console.log("friend users: ", friendUsers);
       setFriends(friendUsers);
 
       // get friend requests
@@ -61,20 +59,17 @@ export default function Friends() {
         userId,
         session.access_token
       );
-      console.log("Fetched friend requests: ", fetchedRequests);
 
       const requestArray = await getFriendRequests(
         userId,
         session.access_token
       );
-      console.log("Request array: ", requestArray);
       const userRequests = await Promise.all(
         requestArray.map(async (request) => {
           const user = await getUser(request.user_id, session.access_token);
           return user.data;
         })
       );
-      console.log("User requests: ", userRequests);
       setFriendRequests(userRequests);
     };
     fetchFriendsData();
@@ -89,7 +84,6 @@ export default function Friends() {
   }
 
   const handleAcceptFriendRequest = async (friendId, answer) => {
-    console.log("accept request");
     await answerFriendRequest(userId, friendId, answer, session.access_token);
   };
 

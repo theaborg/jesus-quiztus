@@ -178,7 +178,6 @@ const GameLobby = () => {
           filter: `receiver_id=eq.${userId}`, // only receive powerups for this player
         },
         (payload) => {
-          console.log("New powerup received:", payload.new);
           let newPowerUp = powerups.find(
             (pow) => pow.type === payload.new.type
           );

@@ -4,7 +4,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // backend/lib/friends/get_friends.js
 var getFriends = async (supabaseClient, userId) => {
-  const { data, error } = await supabaseClient.from("friendships").select("friend_id, user_id").or(`user_id.eq.${userId},friend_id.eq.${userId}`).eq("status", "accepted");
+  const { data, error } = await supabaseClient
+    .from("friendships")
+    .select("friend_id, user_id")
+    .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+    .eq("status", "accepted");
   if (error) {
     console.error("Error in getFriends:", error.message);
     return null;
@@ -15,21 +19,21 @@ var getFriends = async (supabaseClient, userId) => {
 // backend/server/edge_functions/supabase/functions/get-friends/index.ts
 var corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", {
-      headers: corsHeaders
+      headers: corsHeaders,
     });
   }
   try {
     const { userId } = await req.json();
-    console.log("get-friends", userId);
     if (!userId) {
       return new Response("Missing userId", {
         status: 400,
-        headers: corsHeaders
+        headers: corsHeaders,
       });
     }
     const supabase = createClient(
@@ -37,8 +41,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY"),
       {
         global: {
-          headers: { Authorization: req.headers.get("Authorization") ?? "" }
-        }
+          headers: { Authorization: req.headers.get("Authorization") ?? "" },
+        },
       }
     );
     const friends = await getFriends(supabase, userId);
@@ -46,8 +50,8 @@ serve(async (req) => {
       status: 200,
       headers: {
         ...corsHeaders,
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
   } catch (error) {
     let errorMessage = "Unknown error";
@@ -56,11 +60,11 @@ serve(async (req) => {
     }
     return new Response(
       JSON.stringify({
-        error: errorMessage
+        error: errorMessage,
       }),
       {
         status: 500,
-        headers: corsHeaders
+        headers: corsHeaders,
       }
     );
   }

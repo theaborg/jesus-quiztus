@@ -8,7 +8,7 @@ export const getUser = async (supabaseClient, userId) => {
     console.error("Error fetching user:", error.message);
     return null;
   }
-  let avatarUrl = "/profile_picture.jpg"; // fallback
+  let avatarUrl = "/images/profile_picture.jpg"; // fallback
   if (data?.profile_picture) {
     const { data: urlData } = supabaseClient.storage
       .from("profile-pictures")

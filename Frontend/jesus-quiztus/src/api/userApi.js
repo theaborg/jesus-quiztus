@@ -26,7 +26,6 @@ export async function updateProfilePicture(file, userId, accessToken) {
 }
 
 export async function editNickname(nickname, userId, accessToken) {
-  console.log("Editing nickname for user:", userId, "to:", nickname);
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/update-nickname",
     {
@@ -62,7 +61,6 @@ export async function getUser(userId, accessToken) {
   );
 
   const result = await response.json();
-  console.log("getUser result:", result);
 
   if (!response.ok) {
     throw new Error(result.error || "Failed to get user");

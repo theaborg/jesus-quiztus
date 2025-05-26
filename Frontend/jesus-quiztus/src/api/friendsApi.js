@@ -53,12 +53,6 @@ export async function answerFriendRequest(
   answer,
   accessToken
 ) {
-  console.log("Answering friend request:", {
-    friendId,
-    userId,
-    answer,
-    accessToken,
-  });
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/answer-friend-request",
     {

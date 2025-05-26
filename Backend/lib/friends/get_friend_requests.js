@@ -9,6 +9,5 @@ export const getFriendRequests = async (supabaseClient, userId) => {
     console.error("Error in getRequests:", error.message);
     return null;
   }
-  console.log("Friend requests: ", data);
   return { data };
 };

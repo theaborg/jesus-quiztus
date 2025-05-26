@@ -16,7 +16,6 @@ serve(async (req) => {
   }
   try {
     const { userId } = await req.json();
-    console.log("get-friends", userId);
     if (!userId) {
       return new Response("Missing userId", {
         status: 400,

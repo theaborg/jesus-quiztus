@@ -21,22 +21,19 @@ const LobbyView = ({ isHost, onStart, displayName, players }) => {
         <div className="players-header">PLAYERS</div>
         <div className="players-list">
           {players && players.length > 0 ? (
-            players.map(
-              (p, i) => (
-                console.log(p.data.nickname),
-                (
-                  <div key={i} className="player-item">
-                    <img
-                      className="avatar"
-                      src={p.data.profilePictureUrl || "/profile_picture.jpg"}
-                      alt={p.data.nickname}
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="nickname">{p.data.nickname}</div>
-                  </div>
-                )
-              )
-            )
+            players.map((p, i) => (
+              <div key={i} className="player-item">
+                <img
+                  className="avatar"
+                  src={
+                    p.data.profilePictureUrl || "/images/profile_picture.jpg"
+                  }
+                  alt={p.data.nickname}
+                  referrerPolicy="no-referrer"
+                />
+                <div className="nickname">{p.data.nickname}</div>
+              </div>
+            ))
           ) : (
             <div>Inga spelare ännu...</div>
           )}

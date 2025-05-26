@@ -23,7 +23,7 @@ const backupFile = path.join(functionDir, "unbundled.ts"); // 👈 new backup fi
 
 // Step 1: Run tsup to bundle the function
 try {
-  console.log(`📦 Bundling ${functionName} using tsup...`);
+  console.log(`Bundling ${functionName} using tsup...`);
   execSync(
     `npx tsup ${entryFile} --out-dir ${distDir} --format esm --target es2020 --splitting false --sourcemap false --clean --shims`,
     {

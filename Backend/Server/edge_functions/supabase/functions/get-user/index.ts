@@ -13,7 +13,7 @@ var getUser = async (supabaseClient, userId) => {
     console.error("Error fetching user:", error.message);
     return null;
   }
-  let profilePictureUrl = "/profile_picture.jpg";
+  let profilePictureUrl = "/images/profile_piconsocture.jpg";
   if (data?.profile_picture) {
     const { data: urlData } = supabaseClient.storage
       .from("profile-pictures")

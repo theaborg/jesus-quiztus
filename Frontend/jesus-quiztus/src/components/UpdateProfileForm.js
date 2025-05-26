@@ -6,7 +6,7 @@ import "../styles/UpdateProfileForm.scss";
 
 export default function UpdateProfileForm() {
   const { session, displayName } = useUser();
-  const [profilePictureUrl, setAvatarUrl] = useState("");
+  const [profilePictureUrl, setProfilePictureUrl] = useState("");
   const [nickname, setNickname] = useState("");
   const [isEditable, setIsEditable] = useState(false);
 
@@ -14,7 +14,9 @@ export default function UpdateProfileForm() {
     try {
       const profile = await getUser(session.user.id, session.access_token);
       if (profile.success) {
-        setAvatarUrl(profile.data.profilePictureUrl || "/profile_picture.jpg");
+        setProfilePictureUrl(
+          profile.data.profilePictureUrl || "/images/profile_picture.jpg"
+        );
         setNickname(profile.data.nickname || displayName);
       } else {
         console.error("Failed to fetch user profile:", profile.error);
@@ -26,7 +28,6 @@ export default function UpdateProfileForm() {
 
   useEffect(() => {
     if (!session) return;
-    console.log("Session in UpdateProfileForm:", session.user.id);
     getProfile();
   }, [session]);
 
@@ -38,7 +39,7 @@ export default function UpdateProfileForm() {
         session.access_token
       );
       if (result.success) {
-        setAvatarUrl(result.publicUrl);
+        setProfilePictureUrl(result.publicUrl);
       }
     } catch (error) {
       console.error("Error updating profile picture:", error.message);
@@ -68,7 +69,7 @@ export default function UpdateProfileForm() {
         {/* <div className="profile-picture-container"> */}
         <label className="second-header-text">Profile picture</label>
         <img
-          src={profilePictureUrl || "/profile_picture.jpg"}
+          src={profilePictureUrl || "/images/profile_picture.jpg"}
           alt="Profile"
           className="profile-image"
         />

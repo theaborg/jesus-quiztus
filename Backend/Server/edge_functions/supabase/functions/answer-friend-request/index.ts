@@ -4,9 +4,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // backend/lib/friends/answer_friend_request.js
 var answerFriendRequest = async (supabaseClient, userId, friendId, answer) => {
-  console.log(
-    `answerFriendRequest called with userId: ${userId}, friendId: ${friendId}, answer: ${answer}`
-  );
   const { error, data } = await supabaseClient
     .from("friendships")
     .update({ status: answer })

@@ -14,37 +14,6 @@ import "./styles/App.scss";
 import Header from "./components/Header";
 
 export default function App() {
-  const [messages, setMessages] = useState([]);
-  const { supabase } = useUser();
-
-  const sendMessage = async () => {
-    await fetch(
-      "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/smart-service",
-      {
-        method: "POST",
-        body: { name: "Functions" },
-      }
-    );
-  };
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("realtime-messages")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
-        (payload) => {
-          console.log("Nytt meddelande:", payload.new);
-          setMessages((msgs) => [...msgs, payload.new]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
   return (
     <Router>
       <div>

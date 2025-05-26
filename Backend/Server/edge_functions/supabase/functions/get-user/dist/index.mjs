@@ -4,14 +4,20 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // backend/lib/user/get_user.js
 var getUser = async (supabaseClient, userId) => {
-  const { data, error } = await supabaseClient.from("users").select("id, nickname, profile_picture").eq("id", userId).single();
+  const { data, error } = await supabaseClient
+    .from("users")
+    .select("id, nickname, profile_picture")
+    .eq("id", userId)
+    .single();
   if (error) {
     console.error("Error fetching user:", error.message);
     return null;
   }
-  let avatarUrl = "/profile_picture.jpg";
+  let avatarUrl = "/images/profile_picture.jpg";
   if (data?.profile_picture) {
-    const { data: urlData } = supabaseClient.storage.from("profile-pictures").getPublicUrl(`${userId}/${data.profile_picture}`);
+    const { data: urlData } = supabaseClient.storage
+      .from("profile-pictures")
+      .getPublicUrl(`${userId}/${data.profile_picture}`);
     avatarUrl = urlData?.publicUrl || avatarUrl;
   }
   return { ...data, avatarUrl };
@@ -20,7 +26,8 @@ var getUser = async (supabaseClient, userId) => {
 // backend/server/edge_functions/supabase/functions/get-user/index.ts
 var corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -37,25 +44,25 @@ serve(async (req) => {
     }
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: {
-        headers: { Authorization: req.headers.get("Authorization") ?? "" }
-      }
+        headers: { Authorization: req.headers.get("Authorization") ?? "" },
+      },
     });
     const user = await getUser(supabase, user_id);
     if (!user) {
       return new Response(JSON.stringify({ error: "User not found" }), {
         status: 404,
-        headers: corsHeaders
+        headers: corsHeaders,
       });
     }
     return new Response(JSON.stringify({ success: true, data: user }), {
       status: 200,
-      headers: corsHeaders
+      headers: corsHeaders,
     });
   } catch (err) {
     console.error("Request parsing failed", err);
     return new Response(JSON.stringify({ error: "Invalid request body" }), {
       status: 400,
-      headers: corsHeaders
+      headers: corsHeaders,
     });
   }
 });
