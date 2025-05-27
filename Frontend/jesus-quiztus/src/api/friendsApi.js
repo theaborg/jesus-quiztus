@@ -53,6 +53,7 @@ export async function answerFriendRequest(
   answer,
   accessToken
 ) {
+  console.log("Answering friend request:", friendId, userId, answer);
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/answer-friend-request",
     {
@@ -77,6 +78,7 @@ export async function answerFriendRequest(
 
   return result; // success: true
 }
+
 export async function getFriendRequests(userId, accessToken) {
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/get-friend-requests",

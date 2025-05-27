@@ -41,7 +41,7 @@ const LobbyView = ({ isHost, onStart, displayName, players }) => {
 
         {isHost && (
           <button className="start-button" onClick={onStart}>
-            🚀 Starta spelet
+            Starta spelet
           </button>
         )}
       </div>

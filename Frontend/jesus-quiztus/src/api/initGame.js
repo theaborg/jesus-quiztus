@@ -1,9 +1,6 @@
+
 export async function initGame(gameId, setId, access_token) {
-  /**
-   * * Starts a new game by sending a POST request to the Supabase function.
-   * Using authentication token for authorization.
-   * sent via the headers.
-   */
+
   const response = await fetch(
     "https://rixhhkmrhhmiajvxrfli.supabase.co/functions/v1/init_game",
     {
@@ -27,3 +24,4 @@ export async function initGame(gameId, setId, access_token) {
     return { error: null };
   }
 }
+

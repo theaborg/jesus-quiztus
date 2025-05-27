@@ -8,7 +8,7 @@ const ResultView = ({ answers, questions }) => {
   return (
     <div className="result-container">
       <div className="result-card">
-        <h2> Your Result! 🎉</h2>
+        <h2> Your Result!</h2>
         <p className="summary">
           You answered correctly at <strong>{correctCount}</strong> out of  <strong>{questions.length}</strong> quiztitions.
         </p>

@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle-edge": "node scripts/bundle-edge-function.mjs"
+    "bundle-edge": "node scripts/bundle-and-deploy.mjs"
   },
   "repository": {
     "type": "git",
