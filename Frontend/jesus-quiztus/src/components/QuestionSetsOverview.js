@@ -1,8 +1,11 @@
 import { useUser } from "../context/UserContext";
 import React, { useEffect, useState } from "react";
-import { getQuestionSets } from "../CRUD/questions";
+import { supabase } from "../supabaseClient";
+//import { getQuestionSets } from "../CRUD/questions";
 import { useNavigate } from "react-router-dom";
 import CustomQuestionForm from "../components/CustomQuestionForm";
+
+import { getQuestionSets } from "../api/questions/getQuestionSets";
 
 import "../styles/QuestionSetsOverview.scss";
 
@@ -18,7 +21,11 @@ export default function QuestionSetsOverview() {
     if (!userId) return;
 
     const fetchQuestionSets = async () => {
-      const questionSets = await getQuestionSets(userId);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const questionSetsData = await getQuestionSets(userId, session.access_token);
+      const questionSets = JSON.parse(questionSetsData.data);
       setQuestionSets(questionSets);
     };
 

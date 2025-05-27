@@ -22,13 +22,15 @@ const Modal = ({
   const { userId, session } = useUser();
 
   if (!open) return null;
-
-  const player_nicknames = Array.isArray(players)
-    ? players.reduce((users, player) => {
+  console.log("players", players);
+  const player_nicknames = Array.isArray(players?.data)
+    ? players.data.reduce((users, player) => {
         users[player.id] = player.nickname;
         return users;
       }, {})
     : {};
+
+  console.log("player_nicknames", player_nicknames);
 
   const handleBackdropClick = () => {
     onClose();
