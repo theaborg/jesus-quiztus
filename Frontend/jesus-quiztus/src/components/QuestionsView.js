@@ -1,10 +1,13 @@
 import "../styles/QuestionsView.scss";
+import TimerBar from "./TimerBar.js";
+
 const QuestionView = ({
   question,
   questionNumber,
   onAnswer,
   selectedAlternative,
   receivedPowerUps,
+  timeLeft,
 }) => {
   if (!question) {
     return <div>Laddar fråga...</div>; // or just return null if you want to hide it
@@ -23,7 +26,10 @@ const QuestionView = ({
         modfiedQuestion = latestPowerup.effect(modfiedQuestion);
         break;
       case "Eliminate Two":
-        modfiedAlternatives = latestPowerup.effect(modfiedAlternatives, question);
+        modfiedAlternatives = latestPowerup.effect(
+          modfiedAlternatives,
+          question
+        );
         break;
       case "Shuffle Answers":
         modfiedAlternatives = latestPowerup.effect(modfiedAlternatives);
@@ -63,6 +69,7 @@ const QuestionView = ({
           </button>
         ))}
       </div>
+      <TimerBar timeLeft={timeLeft} />
     </div>
   );
 };

@@ -6,7 +6,6 @@ import Modal from "../components/Modal";
 import LobbyView from "../components/LobbyView";
 import ResultView from "../components/ResultView";
 import QuestionView from "../components/QuestionsView";
-import TimerBar from "../components/TimerBar";
 import { setGameForUser, getUser } from "../api/userApi";
 
 import { fetchGameDetails } from "../api/game/getGameDetails";
@@ -402,8 +401,9 @@ const GameLobby = () => {
         onAnswer={handleAnswer}
         selectedAlternative={selectedAlternative}
         receivedPowerUps={receivedPowerUps}
+        timeLeft={timeLeft}
       />
-      <TimerBar timeLeft={timeLeft} />
+      {/* <TimerBar timeLeft={timeLeft} /> */}
     </div>
   );
 };

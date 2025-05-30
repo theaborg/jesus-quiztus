@@ -112,33 +112,35 @@ export default function Friends() {
 
   return (
     <div>
-      <h1 className="second-header-text">Friends</h1>
-      <p>{`You have these friends: ${friends
-        .map((f) => f.friend_id)
-        .join(", ")}`}</p>
-      <ul>
-        {friends.map((friend, index) => (
-          <li key={index}>{friend.nickname}</li>
-        ))}
-      </ul>
-      <h1 className="second-header-text">Friends Requests</h1>
-      <ul>
-        {friendRequests.map((friend) => (
-          <li key={friend.id}>
-            <p>{friend.nickname}</p>
-            <button
-              onClick={() => handleAcceptFriendRequest(friend.id, "accepted")}
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => handleAcceptFriendRequest(friend.id, "rejected")}
-            >
-              Reject
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="friends-header">
+        <h1 className="second-header-text">Friends</h1>
+        {/* <p>{`You have these friends: ${friends
+          .map((f) => f.friend_id)
+          .join(", ")}`}</p> */}
+        <ul>
+          {friends.map((friend, index) => (
+            <li key={index}>{friend.nickname}</li>
+          ))}
+        </ul>
+        <h1 className="second-header-text">Friends Requests</h1>
+        <ul>
+          {friendRequests.map((friend) => (
+            <li key={friend.id}>
+              <p>{friend.nickname}</p>
+              <button
+                onClick={() => handleAcceptFriendRequest(friend.id, "accepted")}
+              >
+                Accept
+              </button>
+              <button
+                onClick={() => handleAcceptFriendRequest(friend.id, "rejected")}
+              >
+                Reject
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
       <UserSearch />
     </div>
   );

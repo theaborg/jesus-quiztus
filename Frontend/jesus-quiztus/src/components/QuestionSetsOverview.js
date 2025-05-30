@@ -24,7 +24,10 @@ export default function QuestionSetsOverview() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const questionSetsData = await getQuestionSets(userId, session.access_token);
+      const questionSetsData = await getQuestionSets(
+        userId,
+        session.access_token
+      );
       const questionSets = JSON.parse(questionSetsData.data);
       setQuestionSets(questionSets);
     };
@@ -75,7 +78,7 @@ export default function QuestionSetsOverview() {
                 Edit
               </button>
               <button
-                className=""
+                className="edit-set-button"
                 onClick={() => {
                   startGameWithSet(set.id);
                 }}

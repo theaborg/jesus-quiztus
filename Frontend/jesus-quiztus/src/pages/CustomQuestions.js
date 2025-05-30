@@ -24,7 +24,7 @@ export default function CustomQuestions() {
     <div className="custom-questions">
       <QuestionSetsOverview />
       <button
-        className="nav-button"
+        className="in-app-button"
         onClick={() => {
           console.log("Create new question set");
           setshowModal(true);

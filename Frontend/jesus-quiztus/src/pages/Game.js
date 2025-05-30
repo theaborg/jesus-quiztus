@@ -27,7 +27,12 @@ export default function Game() {
         data: { session },
       } = await supabase.auth.getSession();
       const name = "unnamed";
-      const resultData = await createCustomGame(fromCustom, userId, name, session.access_token);
+      const resultData = await createCustomGame(
+        fromCustom,
+        userId,
+        name,
+        session.access_token
+      );
       const result = JSON.parse(resultData.data);
       //console.log("Custom game created:", result.id);
       navigate(`/lobby/${result.id}`);
@@ -68,7 +73,7 @@ export default function Game() {
   }
 
   return (
-    <div>
+    <div className="game-page">
       <h1 className="second-header-text">New Game</h1>
       <button className="in-app-button" onClick={() => setShowModal(true)}>
         Setup New Game

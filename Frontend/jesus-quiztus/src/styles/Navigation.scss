@@ -1,27 +1,19 @@
 @use "./colors" as *;
+@use "./mixins" as *;
 
 .navigation {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1em;
+  @include center-column;
+  padding: 2rem;
+  gap: 1rem;
+  width: 100%;
 }
 
 .nav-button {
-  background-color: $second-accent-color;
-  color: $text-on-second-accent-color;
+  @include button-base($second-accent-color, $text-on-second-accent-color);
+  @include responsive-width(400px, 80%);
+  margin: 0.3rem auto;
 
-  width: 20%;
-  max-width: 400px;
-  min-width: 130px;
-
-  margin: 0.5em auto;
-  padding: 0.9rem;
-  border-radius: 2em;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-size: 1.6rem;
-
-  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
 }

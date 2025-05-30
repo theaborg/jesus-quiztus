@@ -1,4 +1,6 @@
 @use "./colors" as *;
+@use "./mixins" as *;
+@use "./fonts" as *;
 
 body {
   background-color: $background-color;
@@ -24,26 +26,33 @@ body {
   }
 }
 
-// Should this be moved?
 .second-header-text {
   font-size: 2.4rem;
   font-weight: lighter;
   text-align: center;
   margin: 0.1em 0;
-  font-family: "Bebas Neue", sans-serif; //font-family: "Lobster", sans-serif;
+  font-family: $font-primary;
 }
 
 .in-app-button {
-  width: 100%;
-  max-width: 400px;
-  font-size: 1.5rem;
-  padding: 0.6em 1em;
+  @include button-base($first-accent-color, black);
   margin-bottom: 2em;
-  border-radius: 1rem;
-  border: none;
-  background-color: $first-accent-color;
-  color: black;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-family: "Bebas Neue", sans-serif;
+  @include responsive-width();
+}
+
+.game-page {
+  @include center-column;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 1em;
+}
+
+.friends-header {
+  @include center-column;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.custom-questions {
+  @include center-column;
 }

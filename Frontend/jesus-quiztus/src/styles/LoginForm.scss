@@ -1,60 +1,46 @@
 @use "./colors" as *;
+@use "./mixins" as *;
 
-.input,
+.login-form {
+  @include center-column;
+  @include card-style;
+  @include responsive-width(400px, 90%);
+  gap: 1.2em;
+  margin: 2em auto;
+  background-color: $background-color;
+}
+
 .input-div {
-  display: block;
-  margin: 0.5em auto;
+  @include responsive-width;
+  margin-bottom: 1em;
+}
+
+.input {
+  @include input-style;
   padding: 0.75em;
-  border-radius: 5em;
   border: 1px solid #ccc;
-  width: 100%;
-  max-width: 400px;
-  box-sizing: border-box;
 }
 
 .login-register-buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 20px;
+  gap: 1em;
   width: 100%;
-  padding: 1em;
 
-  @media (min-width: 600px) {
-    grid-template-columns: 1fr 1fr;
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
   }
 }
 
-.login-button,
-.register-button {
-  padding: 1em 2em;
-  font-size: 1.1rem;
-  border-radius: 2em;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
 .login-button {
-  background-color: $first-accent-color;
-  color: black;
+  @include button-base($first-accent-color, black);
 }
 
 .register-button {
-  background-color: black;
-  color: white;
+  @include button-base($second-accent-color, $text-on-second-accent-color);
 }
 
-// Login form layout
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1em;
-  width: 90%;
-  max-width: 400px;
-  margin: 1em auto;
-}
-
-// Optional line-break classes
+// Optional line-break utility classes
 .auto {
   line-break: auto;
 }

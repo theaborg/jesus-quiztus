@@ -1,5 +1,6 @@
-// TODO: make this stylesheet responsive
 @use "./colors" as *;
+@use "./mixins" as *;
+@use "./fonts" as *;
 
 .modal-backdrop {
   position: fixed;
@@ -7,7 +8,7 @@
   left: 0;
   height: 100vh;
   width: 100vw;
-  background-color: rgba(0, 0, 0, 0.5); // semi-transparent background
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,17 +16,29 @@
 }
 
 .modal-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  @include card-style(2rem);
+  @include responsive-width(90%, 90%);
+  max-width: 500px;
+  text-align: center;
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-family: $font-primary;
+  }
+
+  button + button {
+    margin-top: 0.8rem;
+  }
 }
 
 .modal-button {
-  padding: "0.5rem 1rem";
-  borderradius: "5px";
-  backgroundcolor: "#007bff";
-  color: "#fff";
-  border: "none";
-  cursor: "pointer";
+  @include button-base($first-accent-color, black);
+  width: 100%;
+  margin: 0.5rem 0;
+
+  @media (min-width: 500px) {
+    width: auto;
+    padding: 0.6rem 2rem;
+  }
 }

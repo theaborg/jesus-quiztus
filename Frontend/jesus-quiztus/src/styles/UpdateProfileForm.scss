@@ -1,10 +1,8 @@
 @use "./colors" as *;
+@use "./mixins" as *;
 
 .profile-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  @include center-column;
   margin: 0em auto;
   max-width: 500px;
 }
@@ -13,73 +11,38 @@
   width: 50%;
   aspect-ratio: 1/1;
   border-radius: 50%;
-  padding: none;
+  padding: 0;
 }
 
 .nickname-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8em; // replaces margin and ensures equal spacing
+  @include center-column;
+  gap: 0.8em;
   margin: 0.5em auto;
 }
 
 .display-nickname-input,
 .edit-nickname-input,
 .nickname-label {
-  border-radius: 1rem;
-  border: none;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  font-family: "Bebas Neue", sans-serif;
-  box-sizing: border-box;
-}
-
-.display-nickname-input,
-.edit-nickname-input {
-  font-size: 1.9rem;
-  padding: 0.6em 1em;
+  @include input-style(1.9rem);
 }
 
 .display-nickname-input {
   background-color: $background-color;
   border: 1px solid $first-accent-color;
-
   color: black;
-  width: 100%;
-  max-width: 400px;
   cursor: default;
 }
 
 .in-app-button {
-  width: 100%;
-  max-width: 400px;
-  font-size: 1.5rem;
-  padding: 0.6em 1em;
+  @include button-base($first-accent-color, black);
   margin-bottom: 2em;
-  border-radius: 1rem;
-  border: none;
-  background-color: $first-accent-color;
-  color: black;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-family: "Bebas Neue", sans-serif;
+  @include responsive-width();
 }
 
 .upload-button {
+  @include button-base($first-accent-color, black);
   width: 70%;
   max-width: 400px;
-  font-size: 1.5rem;
-  padding: 0.6em 1em;
-  border-radius: 1rem;
-  border: none;
-  background-color: $first-accent-color;
-  color: black;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  font-family: "Bebas Neue", sans-serif;
-  text-align: center;
 
   &:hover {
     background-color: darken($first-accent-color, 10%);
