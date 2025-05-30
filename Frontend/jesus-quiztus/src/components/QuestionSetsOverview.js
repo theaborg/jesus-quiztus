@@ -57,7 +57,7 @@ export default function QuestionSetsOverview() {
     );
   }
   return (
-    <div className="">
+    <div className="custom-questions">
       <div className="question-sets">
         {questionSets
           .filter((set) => set.name !== "Trivia Game Set")
