@@ -10,30 +10,48 @@ import { getQuestionSets } from "../api/questions/getQuestionSets";
 import "../styles/QuestionSetsOverview.scss";
 
 export default function QuestionSetsOverview() {
-  const { userId } = useUser();
+  const { userId, session } = useUser();
   const [editMode, setEditMode] = useState(false);
   const [editableQuestionSet, setEditableQuestionSet] = useState(null);
   const [questionSets, setQuestionSets] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
+  const fetchQuestionSets = async () => {
+    console.log("In func update question set");
+    const questionSetsData = await getQuestionSets(
+      userId,
+      session.access_token
+    );
+    const questionSets = JSON.parse(questionSetsData.data);
+    setQuestionSets(questionSets);
+  };
+
   useEffect(() => {
     if (!userId) return;
 
-    const fetchQuestionSets = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      const questionSetsData = await getQuestionSets(
-        userId,
-        session.access_token
-      );
-      const questionSets = JSON.parse(questionSetsData.data);
-      setQuestionSets(questionSets);
-    };
-
+    // Get the existing question sets initially
     fetchQuestionSets();
-  }, [userId, showModal]);
+
+    const channel = supabase.channel("question_sets_channel");
+
+    channel
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "QuestionsSet",
+          filter: `user=eq.${userId}`,
+        },
+        fetchQuestionSets
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   const startGameWithSet = async (gameSetID) => {
     //console.log("start game with set: ", gameSetID);
@@ -65,7 +83,7 @@ export default function QuestionSetsOverview() {
             <div key={set.id} className="question-set-card">
               <h2 className="question-set-name">{set.name}</h2>
               <p>{set.description}</p>
-              <p>Questions: {set.amount}</p>
+              {/* <p>Questions: {set.amount}</p> */}
               <button
                 className="edit-set-button"
                 onClick={() => {

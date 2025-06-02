@@ -10,7 +10,7 @@ const QuestionView = ({
   timeLeft,
 }) => {
   if (!question) {
-    return <div>Laddar fråga...</div>; // or just return null if you want to hide it
+    return <div>Loading question...</div>; // or just return null if you want to hide it
   }
   let modfiedQuestion = question.text;
   let modfiedAlternatives = question.alternatives;
@@ -38,7 +38,7 @@ const QuestionView = ({
         break;
     }
   }
-
+  console.log("time left: ", timeLeft);
   return (
     <div className="questions-view">
       <div className="question-card">

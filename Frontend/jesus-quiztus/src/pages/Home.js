@@ -4,26 +4,7 @@ import { useUser } from "../context/UserContext";
 import Navigation from "../components/Navigation";
 
 export default function Home() {
-  //const [session, setSession] = useState(null);
-  const { displayName, session } = useUser();
-
-  /*
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-      }
-    );
-
-    return () => {
-      listener?.subscription?.unsubscribe();
-    };
-  }, []);
-  */
+  const { session } = useUser();
 
   if (!session) {
     return (

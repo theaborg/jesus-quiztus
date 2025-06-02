@@ -10,8 +10,7 @@ import { supabase } from "../supabaseClient";
 import { getUser } from "../api/userApi";
 
 export default function Friends() {
-  const { session } = useUser();
-  const { userId } = useUser();
+  const { session, userId } = useUser();
   const [friends, setFriends] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
 

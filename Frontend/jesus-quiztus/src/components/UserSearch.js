@@ -28,22 +28,6 @@ const UserSearch = ({ currentUserId }) => {
     setLoading(false);
   };
 
-  /** 
-  const addFriend = async (friendId) => {
-    const { error } = await supabase.from('friendships').insert({
-      user_id: session.user.id,
-      friend_id: friendId,
-      status: 'pending',
-    });
-
-    if (error) {
-      console.error('Error adding friend:', error.message);
-    } else {
-      setAddedIds([...addedIds, friendId]);
-    }
-  };
-  */
-
   const handleAddFriend = async (friendId) => {
     try {
       const result = await addFriend(friendId, userId, session.access_token);

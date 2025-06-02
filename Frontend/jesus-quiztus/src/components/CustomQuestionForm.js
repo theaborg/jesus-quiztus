@@ -17,7 +17,7 @@ const CustomQuestionForm = ({
   edit,
   editableQuestionSet,
 }) => {
-  const { userId } = useUser();
+  const { userId, session } = useUser();
 
   const [questions, setQuestions] = useState([
     { question: "", options: ["", "", "", ""], correctIndex: 0, id: null },
@@ -31,11 +31,11 @@ const CustomQuestionForm = ({
 
   useEffect(() => {
     const getQuestionSet = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const setData = await getQuestionSetInfo(editableQuestionSet, userId, session.access_token);
+      const setData = await getQuestionSetInfo(
+        editableQuestionSet,
+        userId,
+        session.access_token
+      );
       const set = JSON.parse(setData.data);
       //console.log("Set: ", set);
       //console.log("set name: ", set[0]?.name);
@@ -44,10 +44,6 @@ const CustomQuestionForm = ({
     };
 
     const getExistingQuestions = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
       const existingData = await fetchQuestions(
         editableQuestionSet,
         session.access_token
@@ -138,10 +134,6 @@ const CustomQuestionForm = ({
     if (edit) {
       //console.log("update table");
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
       if (!session?.access_token) {
         console.error("Missing or invalid session");
         return;
@@ -158,18 +150,33 @@ const CustomQuestionForm = ({
       for (const q of questions) {
         const correctAnswer = q.options[q.correctIndex];
         const wrongOptions = q.options.filter((_, i) => i !== q.correctIndex);
-        //console.log("Session:", session.access_token);
-        await updateQuestion(
-          q.id,
-          q.question,
-          correctAnswer,
-          wrongOptions[0] || "",
-          wrongOptions[1] || "",
-          wrongOptions[2] || "",
-          category,
-          null,
-          session.access_token
-        );
+        if (!q.id) {
+          console.log("editableQuestionSet:", editableQuestionSet);
+          console.log("No Id for question");
+          await createQuestion(
+            q.question,
+            correctAnswer,
+            wrongOptions[0] || "",
+            wrongOptions[1] || "",
+            wrongOptions[2] || "",
+            category,
+            null,
+            editableQuestionSet,
+            session.access_token
+          );
+        } else {
+          await updateQuestion(
+            q.id,
+            q.question,
+            correctAnswer,
+            wrongOptions[0] || "",
+            wrongOptions[1] || "",
+            wrongOptions[2] || "",
+            category,
+            null,
+            session.access_token
+          );
+        }
       }
 
       onClose();
@@ -181,10 +188,6 @@ const CustomQuestionForm = ({
       onSubmit({ name: questionSetName, category, questions });
 
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
         const setIdData = await createSet(
           questionSetName,
           category,
@@ -221,7 +224,7 @@ const CustomQuestionForm = ({
 
   if (!open) return null;
 
-  // 🚨 Prevent render crash if data not loaded yet
+  // Prevent render crash if data not loaded yet
   if (!questions.length || !questions[currentQuestionIndex]) {
     return (
       <div className="modal-backdrop" onClick={onClose}>

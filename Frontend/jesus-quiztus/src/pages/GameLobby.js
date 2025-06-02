@@ -61,9 +61,6 @@ const GameLobby = () => {
 
     const loadGameDetails = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
 
         console.log("Raw gameId:", gameId);
 
@@ -102,13 +99,6 @@ const GameLobby = () => {
     if (gameState !== "pending") return;
 
     const interval = setInterval(async () => {
-      //const activePlayers = await getActivePlayers(gameId);
-      //setPlayers(activePlayers || []);
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
       const resp = await getActivePlayers(gameId, session.access_token);
       const activePlayers = JSON.parse(resp.data);
       // For each player, fetch their profile image
@@ -126,13 +116,8 @@ const GameLobby = () => {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
       let resp = await getActivePlayers(gameId, session.access_token);
       let players = JSON.parse(resp.data);
-      //console.log("PowerUP getPlayers:", resp.data);
       setPlayers(players);
     };
 
@@ -168,9 +153,6 @@ const GameLobby = () => {
           filter: `id=eq.${gameId}`,
         },
         async (payload) => {
-          const {
-            data: { session },
-          } = await supabase.auth.getSession();
 
           const newState = payload.new.state;
           const isHost = userId === payload.new.host;
@@ -200,7 +182,7 @@ const GameLobby = () => {
     };
   }, [gameId, userId]);
 
-  // Temp listener for powerups
+  // listener for powerups
   useEffect(() => {
     if (!userId || !gameId) return;
 
@@ -212,7 +194,7 @@ const GameLobby = () => {
           event: "INSERT",
           schema: "public",
           table: "Powerups",
-          filter: `receiver_id=eq.${userId}`, // only receive powerups for this player
+          filter: `receiver_id=eq.${userId}`,
         },
         (payload) => {
           let newPowerUp = powerups.find(
@@ -243,39 +225,21 @@ const GameLobby = () => {
     let interval;
 
     const setupTimer = async () => {
-      // Host sets start time and saves to DB
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
       const isHost = userId === hostId;
 
       let start;
+      const now = new Date().toTimeString().split(" ")[0];
 
       if (isHost) {
-        const newStartDate = new Date();
-        const formatted = newStartDate.toTimeString().split(" ")[0];
-        setStartTime(formatted);
-        await setGameStartTime(gameId, formatted, session.access_token);
-        start = formatted;
+        start = now;
+        setStartTime(start);
+        await setGameStartTime(gameId, start, session.access_token);
       } else {
-        // Non-host fetches start time from DB
-        let responseData = await getGameStartTime(gameId, session.access_token);
-        let response = JSON.parse(responseData.data);
-        while (!response || response.length === 0 || !response[0].start_time) {
-          responseData = await getGameStartTime(gameId, session.access_token);
-          response = JSON.parse(responseData.data);
-        }
-        start = response[0].start_time;
+        start = now;
         setStartTime(start);
       }
 
-      // Begin countdown
       interval = setInterval(async () => {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
         const currTime = new Date().toTimeString().split(" ")[0];
         const elapsed =
           timeStringToSeconds(currTime) - timeStringToSeconds(start);
@@ -285,33 +249,28 @@ const GameLobby = () => {
 
         if (remaining <= 0) {
           clearInterval(interval);
-          setCurrentQuestionIndex((prev) => prev + 1);
-          setSelectedAlternative(null); // <-- reset selection
-          // behöver ändra state i databasen också
-          // så att power ups kan tas bort och statistik kan lagras
-          if (
-            currentQuestionIndex >= questions.length - 1 &&
-            gameState !== "over"
-          ) {
+
+          const nextIndex = currentQuestionIndex + 1;
+
+          if (nextIndex >= questions.length) {
             setGameState("over");
 
-            if (hostId === userId) {
+            if (userId === hostId) {
               await setState(gameId, "over", session.access_token);
             }
+          } else {
+            setCurrentQuestionIndex(nextIndex);
+            setSelectedAlternative(null);
           }
         }
       }, 100);
     };
 
     setupTimer();
-
     return () => clearInterval(interval);
   }, [currentQuestionIndex, questions.length, userId, hostId, gameId]);
 
   const handleFirstQuestion = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
 
     const currTime = new Date();
     const formattedTime = currTime.toTimeString().split(" ")[0];
@@ -321,9 +280,6 @@ const GameLobby = () => {
   };
 
   const handleStartGame = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
 
     if (!session) {
       console.error("Ingen session hittades.");

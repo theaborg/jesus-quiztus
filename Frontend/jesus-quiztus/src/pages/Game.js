@@ -23,9 +23,6 @@ export default function Game() {
 
   useEffect(() => {
     const startCustomGame = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
       const name = "unnamed";
       const resultData = await createCustomGame(
         fromCustom,
@@ -45,12 +42,7 @@ export default function Game() {
 
   // Handling the form for setting up a new game
   const handleStart = async (formData) => {
-    const {
-      data: { session: authSession },
-      error,
-    } = await supabase.auth.getSession();
-
-    if (error || !authSession) {
+    if (!session) {
       alert("User session missing or expired.");
       return;
     }
@@ -61,7 +53,7 @@ export default function Game() {
       // TODO:
       // Should maybe check that this is a valid gameID?
 
-      const result = await createGame(formData, authSession.access_token);
+      const result = await createGame(formData, session.access_token);
       navigate(`/lobby/${result.gameId}`);
     } catch (error) {
       alert(error.message);
