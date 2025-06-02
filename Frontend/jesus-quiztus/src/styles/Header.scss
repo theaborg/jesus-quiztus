@@ -1,0 +1,45 @@
+@use "./mixins" as *;
+@use "./colors" as *;
+@use "./fonts" as *;
+
+.default-header-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 1em;
+  cursor: pointer;
+}
+
+.login-header-div {
+  @include center-column;
+  padding: 1em;
+  cursor: pointer;
+}
+
+.default-header-img {
+  @include responsive-width(230px, 10%);
+  height: auto;
+  pointer-events: none;
+}
+
+.login-header-img {
+  @include responsive-width(300px, 45%);
+  height: auto;
+  pointer-events: none;
+}
+
+.header-text {
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 0.5em 0;
+  font-family: $font-primary;
+  color: $second-accent-color;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-header-img {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}

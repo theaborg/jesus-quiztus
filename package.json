@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@supabase/auth-ui-react": "^0.2.8",
+    "@supabase/supabase-js": "^2.49.4",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "name": "tddd27",
+  "version": "1.0.0",
+  "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+  "main": "index.js",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle-edge": "node scripts/bundle-and-deploy.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.liu.se:emivi030/tddd27.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
