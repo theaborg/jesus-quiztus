@@ -61,6 +61,10 @@ const GameLobby = () => {
 
     const loadGameDetails = async () => {
       try {
+        // TODO: Figure out why we can't use session directly here
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
         console.log("Raw gameId:", gameId);
 
@@ -153,7 +157,6 @@ const GameLobby = () => {
           filter: `id=eq.${gameId}`,
         },
         async (payload) => {
-
           const newState = payload.new.state;
           const isHost = userId === payload.new.host;
 
@@ -225,6 +228,7 @@ const GameLobby = () => {
     let interval;
 
     const setupTimer = async () => {
+      // Host sets start time and saves to DB
       const isHost = userId === hostId;
 
       let start;
@@ -234,7 +238,11 @@ const GameLobby = () => {
         start = now;
         setStartTime(start);
         await setGameStartTime(gameId, start, session.access_token);
+        start = now;
+        setStartTime(start);
+        await setGameStartTime(gameId, start, session.access_token);
       } else {
+        start = now;
         start = now;
         setStartTime(start);
       }
@@ -271,7 +279,6 @@ const GameLobby = () => {
   }, [currentQuestionIndex, questions.length, userId, hostId, gameId]);
 
   const handleFirstQuestion = async () => {
-
     const currTime = new Date();
     const formattedTime = currTime.toTimeString().split(" ")[0];
 
@@ -280,7 +287,6 @@ const GameLobby = () => {
   };
 
   const handleStartGame = async () => {
-
     if (!session) {
       console.error("Ingen session hittades.");
       return;
