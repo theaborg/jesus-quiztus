@@ -221,7 +221,7 @@ const GameLobby = () => {
     return hh * 3600 + mm * 60 + ss;
   }
 
-  const QUESTION_DURATION = 5;
+  const QUESTION_DURATION = 10;
   useEffect(() => {
     if (currentQuestionIndex >= questions.length) return;
 
