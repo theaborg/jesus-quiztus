@@ -1,3 +1,17 @@
+# Run project
+
+You can check out the app at https://jesus-quiztus.vercel.app/
+
+Alternatively, you can follow these steps (note that you'll have to reach out to us to get the environment variables):
+
+
+1. Clone the repo.
+2. Run these commands in the terminal:
+- cd Frontend/jesus-quiztus/
+- npm install
+- npm start
+3. Check the app out at localhost.
+
 # Jesus Quiztus specification
 
 The aim of this project is to create a focused and detailed project, without using a lot of boilerplate code. The project should also be focused around frontend. This specification will be a so-called living document, meaning we will update it as needed during the project.
