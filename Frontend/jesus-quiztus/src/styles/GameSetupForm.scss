@@ -1,0 +1,53 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+@use "./fonts" as *;
+
+.game-setup-div {
+  @include center-column;
+  margin: 0em auto;
+  max-width: 500px;
+}
+
+.game-setup-form {
+  @include center-column;
+  padding: 1em;
+  margin: 1em auto;
+  width: 90%;
+  max-width: 500px;
+  .form-row {
+    @include center-column;
+    .input-label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .game-setup-input {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+  }
+}
+
+.game-setup-input {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  text-align: center;
+  margin: 0.5em 0;
+  font-family: $font-primary;
+}
+
+.input-label {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  width: 100%;
+  margin: 0.5em 0;
+  font-family: $font-primary;
+}
+
+.start-game-button {
+  @include button-base($first-accent-color, black);
+  @include responsive-width();
+}

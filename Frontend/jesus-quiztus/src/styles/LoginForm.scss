@@ -1,0 +1,58 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.login-form {
+  @include center-column;
+  @include card-style;
+  @include responsive-width(400px, 90%);
+  gap: 1.2em;
+  margin: 2em auto;
+  background-color: $background-color;
+}
+
+.input-div {
+  @include responsive-width;
+  margin-bottom: 1em;
+}
+
+.input {
+  @include input-style;
+  padding: 0.75em;
+  border: 1px solid #ccc;
+}
+
+.login-register-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  width: 100%;
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.login-button {
+  @include button-base($first-accent-color, black);
+}
+
+.register-button {
+  @include button-base($second-accent-color, $text-on-second-accent-color);
+}
+
+// Optional line-break utility classes
+.auto {
+  line-break: auto;
+}
+.loose {
+  line-break: loose;
+}
+.normal {
+  line-break: normal;
+}
+.strict {
+  line-break: strict;
+}
+.anywhere {
+  line-break: anywhere;
+}

@@ -1,0 +1,119 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.questions-view {
+  min-height: 100vh;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  @include center-column;
+  justify-content: flex-start;
+
+  .question-card {
+    @include card-style;
+    max-width: 600px;
+    margin-bottom: 2rem;
+
+    img {
+      width: 100%;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .category {
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: $second-accent-color;
+    }
+
+    .question-text {
+      font-size: 1.2rem;
+      color: #333;
+    }
+  }
+
+  .alternatives-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: 100%;
+    max-width: 600px;
+
+    button {
+      @include button-base(#eee, #000);
+      aspect-ratio: 1 / 1; // Each button is a square
+      width: 100%;
+      height: auto; // height is controlled by aspect-ratio
+      max-height: 5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 2px solid transparent;
+      word-wrap: break-word;
+      white-space: normal;
+      padding: 0.5rem;
+
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &.selected {
+        border-color: $second-accent-color;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+        transform: scale(1.03);
+      }
+    }
+
+    // Optional: Color variants
+    button:nth-child(1) {
+      background-color: #ffe5e5;
+      &:hover {
+        background-color: #ffcccc;
+      }
+    }
+
+    button:nth-child(2) {
+      background-color: #e5ffe5;
+      &:hover {
+        background-color: #ccffcc;
+      }
+    }
+
+    button:nth-child(3) {
+      background-color: #e5f0ff;
+      &:hover {
+        background-color: #cce0ff;
+      }
+    }
+
+    button:nth-child(4) {
+      background-color: #f9f9f9;
+      &:hover {
+        background-color: #eeeeee;
+      }
+    }
+  }
+}
+
+// Responsive tweaks
+@media (max-width: 480px) {
+  .questions-view {
+    padding: 1rem;
+
+    .question-card {
+      padding: 1rem;
+      .question-text {
+        font-size: 1rem;
+      }
+    }
+
+    .alternatives-grid {
+      gap: 0.75rem;
+
+      button {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+  }
+}

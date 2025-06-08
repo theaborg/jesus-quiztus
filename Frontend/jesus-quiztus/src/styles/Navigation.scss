@@ -1,0 +1,19 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.navigation {
+  @include center-column;
+  padding: 2rem;
+  gap: 1rem;
+  width: 100%;
+}
+
+.nav-button {
+  @include button-base($second-accent-color, $text-on-second-accent-color);
+  @include responsive-width(400px, 80%);
+  margin: 0.3rem auto;
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
+}

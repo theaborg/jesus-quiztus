@@ -1,0 +1,12 @@
+@use "./mixins" as *;
+@use "./colors" as *;
+
+.timer-bar {
+  height: 10px;
+  background-color: red;
+  transition: width 0.1s linear;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 50%;
+  margin: 1rem;
+}

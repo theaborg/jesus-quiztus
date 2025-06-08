@@ -1,0 +1,24 @@
+@use "./mixins" as *;
+@use "./colors" as *;
+
+.user-search-container {
+  @include center-column;
+  margin: 0em auto;
+  max-width: 500px;
+}
+
+.user-search-input {
+  @include input-style(1.5rem);
+  font-weight: lighter;
+  align-self: right;
+  text-align: center;
+  margin: 0.5em 0 0 0;
+  padding-bottom: 0;
+}
+
+.user-result-text {
+  margin-top: 0;
+  padding-top: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}

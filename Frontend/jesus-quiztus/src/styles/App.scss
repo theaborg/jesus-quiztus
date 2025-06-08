@@ -1,0 +1,58 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+@use "./fonts" as *;
+
+body {
+  background-color: $background-color;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.second-header-text {
+  font-size: 2.4rem;
+  font-weight: lighter;
+  text-align: center;
+  margin: 0.1em 0;
+  font-family: $font-primary;
+}
+
+.in-app-button {
+  @include button-base($first-accent-color, black);
+  margin-bottom: 2em;
+  @include responsive-width();
+}
+
+.game-page {
+  @include center-column;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 1em;
+}
+
+.friends-header {
+  @include center-column;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.custom-questions {
+  @include center-column;
+}

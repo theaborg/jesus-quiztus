@@ -1,0 +1,102 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.result-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: $background-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .result-card {
+    @include card-style(2rem);
+    max-width: 700px;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: $second-accent-color;
+    }
+
+    p.summary {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    ul.answer-list {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 2rem;
+      text-align: left;
+
+      li {
+        background-color: #f9fafb;
+        border: 1px solid #ddd;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+
+        .question-text {
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          color: $second-accent-color;
+        }
+
+        .correct {
+          color: #16a34a;
+        }
+
+        .wrong {
+          color: #dc2626;
+        }
+      }
+    }
+
+    .back-button {
+      @include button-base($first-accent-color, $text-on-second-accent-color);
+      padding: 0.75rem 1.5rem;
+      font-size: 1.2rem;
+      border-radius: 2rem;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: darken($first-accent-color, 10%);
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 600px) {
+  .result-container {
+    padding: 1rem;
+
+    .result-card {
+      padding: 1.5rem;
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      p.summary {
+        font-size: 1rem;
+      }
+
+      ul.answer-list li {
+        padding: 0.75rem;
+
+        .question-text {
+          font-size: 1rem;
+        }
+      }
+
+      .back-button {
+        font-size: 1rem;
+        padding: 0.6rem 1.2rem;
+      }
+    }
+  }
+}

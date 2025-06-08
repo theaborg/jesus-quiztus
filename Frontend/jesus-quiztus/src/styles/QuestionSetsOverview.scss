@@ -1,0 +1,53 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.custom-questions {
+  @include center-column;
+  justify-content: flex-start;
+
+  min-height: 1rem;
+
+  h1 {
+    margin-top: 2rem;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+}
+
+.question-sets {
+  @include center-column;
+  gap: 1.5rem;
+  padding: 0 1rem 2rem 1rem;
+  @include responsive-width(600px);
+}
+
+.question-set-card {
+  @include card-style(1.5rem);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0.3rem 0;
+    font-size: 1rem;
+    color: #333;
+  }
+
+  button {
+    @include button-base($first-accent-color, black);
+    margin: 0.4rem;
+    font-size: 1rem;
+    padding: 0.4rem 1.2rem;
+
+    &:hover {
+      background-color: darken($first-accent-color, 10%);
+    }
+  }
+}

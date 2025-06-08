@@ -1,0 +1,125 @@
+@use "./colors" as *;
+@use "./mixins" as *;
+
+.lobby-container {
+  min-height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+
+  .lobby-card {
+    @include card-style(2rem);
+    background-color: $background-color;
+    width: 100%;
+    max-width: 500px;
+
+    .start-button {
+      margin-top: 1.5rem;
+      @include button-base(#4ade80);
+      font-weight: bold;
+      font-size: 1rem;
+      border-radius: 9999px;
+      transition: background-color 0.2s, transform 0.15s;
+
+      &:hover {
+        background-color: #22c55e;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+
+    .logo {
+      width: 80px;
+      margin: 0 auto 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      color: $second-accent-color;
+    }
+
+    .qr-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+
+      canvas {
+        max-width: 100%;
+        height: auto;
+      }
+    }
+
+    .players-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #333;
+      text-align: center;
+    }
+
+    .players-list {
+      background-color: lighten($background-color, 5%);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: left;
+
+      .player-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        .avatar {
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 0.75rem;
+          border: 2px solid #ddd;
+        }
+
+        .nickname {
+          font-size: 1rem;
+          color: #444;
+          word-break: break-word;
+        }
+      }
+    }
+  }
+}
+
+// MEDIA QUERIES
+@media (max-width: 500px) {
+  .lobby-card {
+    padding: 1.2rem;
+
+    h1 {
+      font-size: 1.2rem;
+    }
+
+    .start-button {
+      font-size: 0.9rem;
+      padding: 0.6rem 1.2rem;
+    }
+
+    .players-list {
+      padding: 0.8rem;
+
+      .player-item {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .avatar {
+          margin-bottom: 0.5rem;
+          margin-right: 0;
+        }
+      }
+    }
+  }
+}
